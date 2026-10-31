@@ -20,3 +20,23 @@ export const searchDonors = async (req, res) => {
     });
   }
 };
+
+export const toggleDonorAvailability = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    user.isAvailable = !user.isAvailable;
+    await user.save();
+    res.status(200).json({
+      success: true,
+      message: "Status updated",
+      isAvailable: user.isAvailable,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};

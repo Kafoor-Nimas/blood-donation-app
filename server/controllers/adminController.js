@@ -29,3 +29,30 @@ export const getAdminStats = async (req, res) => {
     });
   }
 };
+
+export const verifyDonor = async (req, res) => {
+  try {
+    const donor = await User.findById(req.params.id);
+    if (!donor) {
+      return res.status(404).json({
+        success: false,
+        message: "Donor not found",
+      });
+    }
+
+    donor.isVerified = true;
+    await donor.save();
+    res.status(200).json({
+      success: true,
+      message: "Donor verified successfully",
+      donor,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};

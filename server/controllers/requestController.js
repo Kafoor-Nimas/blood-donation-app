@@ -55,3 +55,24 @@ export const createBloodRequest = async (req, res) => {
     });
   }
 };
+
+export const getBloodRequests = async (req, res) => {
+  try {
+    const requests = await BloodRequest.find().populate(
+      "requester",
+      "name email",
+    );
+
+    res.status(200).json({
+      success: true,
+      requests,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};

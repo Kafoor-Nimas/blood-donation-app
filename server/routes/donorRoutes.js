@@ -2,8 +2,8 @@ import express from "express";
 import {
   searchDonors,
   toggleDonorAvailability,
-} from "../controllers/donorController";
-import { protect } from "../middleware/authMiddleware";
+} from "../controllers/donorController.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 

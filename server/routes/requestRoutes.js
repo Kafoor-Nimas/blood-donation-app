@@ -1,9 +1,9 @@
 import express from "express";
-import { protect } from "../middleware/authMiddleware";
+import { protect } from "../middleware/authMiddleware.js";
 import {
   createBloodRequest,
   getBloodRequests,
-} from "../controllers/requestController";
+} from "../controllers/requestController.js";
 
 const router = express.Router();
 

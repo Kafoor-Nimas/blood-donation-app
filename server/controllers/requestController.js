@@ -1,6 +1,6 @@
-import BloodRequest from "../models/BloodRequest";
-import User from "../models/User";
-import { sendEmail } from "../utils/sendEmail";
+import BloodRequest from "../models/BloodRequest.js";
+import User from "../models/User.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 export const createBloodRequest = async (req, res) => {
   try {

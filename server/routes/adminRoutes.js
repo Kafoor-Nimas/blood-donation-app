@@ -1,6 +1,6 @@
 import express from "express";
-import { adminOnly, protect } from "../middleware/authMiddleware";
-import { getAdminStats, verifyDonor } from "../controllers/adminController";
+import { adminOnly, protect } from "../middleware/authMiddleware.js";
+import { getAdminStats, verifyDonor } from "../controllers/adminController.js";
 
 const router = express.Router();
 

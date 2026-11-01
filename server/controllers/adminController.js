@@ -1,5 +1,5 @@
-import BloodRequest from "../models/BloodRequest";
-import User from "../models/User";
+import BloodRequest from "../models/BloodRequest.js";
+import User from "../models/User.js";
 
 export const getAdminStats = async (req, res) => {
   try {

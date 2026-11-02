@@ -7,12 +7,14 @@ import BloodRequests from "./pages/BloodRequests";
 import CreateRequest from "./pages/CreateRequest";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ScrollToTop from "./components/ScrollToTop";
 // import Products from "./pages/Products";
 
 export default function App() {
   return (
     <AppProvider>
       <Router>
+        <ScrollToTop />
         <div className="min-h-screen flex flex-col">
           <Routes>
             <Route path="/" element={<Home />} />

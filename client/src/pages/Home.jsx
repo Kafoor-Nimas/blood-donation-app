@@ -5,7 +5,7 @@ import Hero from "../components/Hero";
 import QuickActionCards from "../components/QuickActionCards";
 import ImpactStats from "../components/ImpactStats";
 import BloodGroupMatrix from "../components/BloodGroupMatrix";
-// import HowItWorks from "../components/HowItWorks";
+import HowItWorks from "../components/HowItWorks";
 // import UrgentRequests from "../components/UrgentRequests";
 // import WhyLifeLink from "../components/WhyLifeLink";
 // import Testimonials from "../components/Testimonials";
@@ -32,8 +32,8 @@ export default function Home() {
         <QuickActionCards />
         <ImpactStats />
         <BloodGroupMatrix />
-        {/*  <HowItWorks />
-        <UrgentRequests />
+          <HowItWorks />
+       {/* <UrgentRequests />
         <WhyLifeLink />
         <Testimonials />
         <CallToAction /> */}

@@ -6,7 +6,7 @@ import QuickActionCards from "../components/QuickActionCards";
 import ImpactStats from "../components/ImpactStats";
 import BloodGroupMatrix from "../components/BloodGroupMatrix";
 import HowItWorks from "../components/HowItWorks";
-// import UrgentRequests from "../components/UrgentRequests";
+import UrgentRequests from "../components/UrgentRequests";
 // import WhyLifeLink from "../components/WhyLifeLink";
 // import Testimonials from "../components/Testimonials";
 // import CallToAction from "../components/CallToAction";
@@ -32,9 +32,9 @@ export default function Home() {
         <QuickActionCards />
         <ImpactStats />
         <BloodGroupMatrix />
-          <HowItWorks />
-       {/* <UrgentRequests />
-        <WhyLifeLink />
+        <HowItWorks />
+        <UrgentRequests />
+        {/* <WhyLifeLink />
         <Testimonials />
         <CallToAction /> */}
       </main>

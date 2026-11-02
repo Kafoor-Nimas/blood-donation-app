@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Navbar from "../components/Navbar";
 // import LiveDispatchBanner from "../components/LiveDispatchBanner";
-// import Hero from "../components/Hero";
+import Hero from "../components/Hero";
 // import QuickActionCards from "../components/QuickActionCards";
 // import ImpactStats from "../components/ImpactStats";
 // import BloodGroupMatrix from "../components/BloodGroupMatrix";
@@ -27,8 +27,8 @@ export default function Home() {
     >
       <Navbar />
       <main className="w-full">
+          <Hero />
         {/* <LiveDispatchBanner />
-        <Hero />
         <QuickActionCards />
         <ImpactStats />
         <BloodGroupMatrix />

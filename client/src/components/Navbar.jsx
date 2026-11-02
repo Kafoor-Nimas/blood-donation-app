@@ -95,7 +95,11 @@ export default function Navbar() {
           </button>
 
           {/* Profile Badge */}
-          <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-[#334155]">
+          
+          <Link
+            to="/login"
+            className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-[#334155] hover:opacity-80 transition-opacity cursor-pointer"
+          >
             <img
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2G3ltv8cQ0E23GIppn5aiMa68EYbw57Pw7NkBgHnBSezo_ivW0UrmgeHupmUISKVRWvOUot1oYvVyf_pLNs9xj8iolBHWPks9S-9CDvQYJM9LVO0LCF5BayrrXNFoT48c4nyajlq8wCIOfPwf3ArV2AooSQrERdporSrdN5SPNgr7Q-gH5BwKrBi9hmnrS56K3c2Tcs3J5Rr7bWQZ4Qju0OqGVW27sT8OMp21RcaN"
               alt="Profile"
@@ -113,7 +117,7 @@ export default function Navbar() {
                 Requester
               </span>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </header>

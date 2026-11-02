@@ -72,7 +72,7 @@ export default function CreateRequest() {
       <Navbar />
 
       <main className="w-full pt-16">
-        <div className="w-full max-w-5xl mx-auto px-4 py-8">
+        <div className="w-full max-w-6xl mx-auto px-4 py-8">
           <BreadcrumbHeader />
           <InfoAlertBanner />
 

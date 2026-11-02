@@ -10,13 +10,12 @@ import Navbar from "../components/Navbar";
 // import WhyLifeLink from "../components/WhyLifeLink";
 // import Testimonials from "../components/Testimonials";
 // import CallToAction from "../components/CallToAction";
-// import Footer from "../components/Footer";
+import Footer from "../components/Footer";
 // import { useApp } from "../context/AppContext";
 
 export default function Home() {
   //   const { isDarkMode } = useApp();
-    const { isDarkMode, setIsDarkMode } = useState(false);
-  
+  const { isDarkMode, setIsDarkMode } = useState(false);
 
   return (
     <div
@@ -27,8 +26,8 @@ export default function Home() {
       }`}
     >
       <Navbar />
-      {/* <main className="w-full">
-        <LiveDispatchBanner />
+      <main className="w-full">
+        {/* <LiveDispatchBanner />
         <Hero />
         <QuickActionCards />
         <ImpactStats />
@@ -37,9 +36,9 @@ export default function Home() {
         <UrgentRequests />
         <WhyLifeLink />
         <Testimonials />
-        <CallToAction />
+        <CallToAction /> */}
       </main>
-      <Footer /> */}
+      <Footer />
     </div>
   );
 }

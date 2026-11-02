@@ -8,7 +8,7 @@ import BloodGroupMatrix from "../components/BloodGroupMatrix";
 import HowItWorks from "../components/HowItWorks";
 import UrgentRequests from "../components/UrgentRequests";
 import WhyLifeLink from "../components/WhyLifeLink";
-// import Testimonials from "../components/Testimonials";
+import Testimonials from "../components/Testimonials";
 // import CallToAction from "../components/CallToAction";
 import Footer from "../components/Footer";
 // import { useApp } from "../context/AppContext";
@@ -35,8 +35,8 @@ export default function Home() {
         <HowItWorks />
         <UrgentRequests />
          <WhyLifeLink />
-       {/* <Testimonials />
-        <CallToAction /> */}
+        <Testimonials />
+       {/* <CallToAction /> */}
       </main>
       <Footer />
     </div>

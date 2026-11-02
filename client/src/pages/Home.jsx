@@ -9,13 +9,12 @@ import HowItWorks from "../components/HowItWorks";
 import UrgentRequests from "../components/UrgentRequests";
 import WhyLifeLink from "../components/WhyLifeLink";
 import Testimonials from "../components/Testimonials";
-// import CallToAction from "../components/CallToAction";
+import CallToAction from "../components/CallToAction";
 import Footer from "../components/Footer";
-// import { useApp } from "../context/AppContext";
+import { useApp } from "../context/AppContext";
 
 export default function Home() {
-  //   const { isDarkMode } = useApp();
-  const { isDarkMode, setIsDarkMode } = useState(false);
+  const { isDarkMode } = useApp();
 
   return (
     <div
@@ -34,9 +33,9 @@ export default function Home() {
         <BloodGroupMatrix />
         <HowItWorks />
         <UrgentRequests />
-         <WhyLifeLink />
+        <WhyLifeLink />
         <Testimonials />
-       {/* <CallToAction /> */}
+        <CallToAction />
       </main>
       <Footer />
     </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import RequestCard from "../components/RequestCard";
@@ -7,7 +8,7 @@ import { INITIAL_REQUESTS_DATA } from "../data/data";
 import { useApp } from "../context/AppContext";
 
 export default function BloodRequests() {
-  const { isDarkMode } = useApp();
+  const { isDarkMode, requests } = useApp();
 
   // Filter States
   const [statusTab, setStatusTab] = useState("all");
@@ -63,8 +64,27 @@ export default function BloodRequests() {
   }, [showToast]);
 
   // Multi-Filter Logic
+  //   const filteredRequests = useMemo(() => {
+  //     return INITIAL_REQUESTS_DATA.filter((item) => {
+  //       if (statusTab !== "all" && item.status !== statusTab) return false;
+  //       if (bloodFilter && item.bloodGroup !== bloodFilter) return false;
+  //       if (districtFilter && item.district !== districtFilter) return false;
+
+  //       if (urgencyFilter === "urgent" && item.status !== "urgent") return false;
+  //       if (
+  //         urgencyFilter === "critical" &&
+  //         item.status !== "urgent" &&
+  //         item.status !== "open"
+  //       )
+  //         return false;
+  //       if (urgencyFilter === "standard" && item.status !== "open") return false;
+
+  //       return true;
+  //     });
+  //   }, [statusTab, bloodFilter, districtFilter, urgencyFilter]);
+
   const filteredRequests = useMemo(() => {
-    return INITIAL_REQUESTS_DATA.filter((item) => {
+    return requests.filter((item) => {
       if (statusTab !== "all" && item.status !== statusTab) return false;
       if (bloodFilter && item.bloodGroup !== bloodFilter) return false;
       if (districtFilter && item.district !== districtFilter) return false;
@@ -80,7 +100,7 @@ export default function BloodRequests() {
 
       return true;
     });
-  }, [statusTab, bloodFilter, districtFilter, urgencyFilter]);
+  }, [requests, statusTab, bloodFilter, districtFilter, urgencyFilter]);
 
   const resetAllFilters = () => {
     setStatusTab("all");
@@ -143,18 +163,15 @@ export default function BloodRequests() {
             </div>
 
             <div className="flex items-center gap-3 self-start md:self-auto shrink-0">
-              <button
-                type="button"
-                onClick={() =>
-                  setActiveModalRequest({ id: "NEW", hospital: "Broadcast" })
-                }
+              <Link
+                to="/create-request"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#b70011] text-white font-semibold text-xs rounded-xl shadow-md hover:brightness-110 transition-all cursor-pointer"
               >
                 <span className="material-symbols-outlined !text-[20px]">
                   add_circle
                 </span>
-                <span>+ Create Blood Request</span>
-              </button>
+                <span>Create Blood Request</span>
+              </Link>
             </div>
           </div>
         </div>

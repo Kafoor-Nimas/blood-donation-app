@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 
 export default function Navbar() {
@@ -13,7 +14,7 @@ export default function Navbar() {
     >
       <div className="h-16 max-w-[1600px] mx-auto px-6 lg:px-12 flex items-center justify-between gap-4">
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <span
             className="material-symbols-outlined !text-[28px] text-[#b70011]"
             style={{ fontSize: "28px" }}
@@ -23,7 +24,7 @@ export default function Navbar() {
           <span className="font-bold text-xl tracking-tight text-[#b70011]">
             LifeLink
           </span>
-        </a>
+        </Link>
 
         {/* Navigation Links */}
         <nav className="hidden lg:flex items-center gap-1">
@@ -33,9 +34,9 @@ export default function Navbar() {
             { name: "Blood Requests", href: "/blood-requests" },
             { name: "About Us", href: "/about-us" },
           ].map((link) => (
-            <a
+            <Link
               key={link.name}
-              href={link.href}
+              to={link.href}
               className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${
                 isDarkMode
                   ? "text-[#CBD5E1] hover:text-white hover:bg-[#1E293B]"
@@ -43,7 +44,7 @@ export default function Navbar() {
               }`}
             >
               {link.name}
-            </a>
+            </Link>
           ))}
         </nav>
 

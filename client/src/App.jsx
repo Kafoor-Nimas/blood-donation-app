@@ -4,6 +4,7 @@ import { AppProvider } from "./context/AppContext";
 import Home from "./pages/Home";
 import FindDonors from "./pages/FindDonors";
 import BloodRequests from "./pages/BloodRequests";
+import CreateRequest from "./pages/CreateRequest";
 // import Products from "./pages/Products";
 
 export default function App() {
@@ -15,8 +16,8 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/find-donors" element={<FindDonors />} />
             <Route path="/blood-requests" element={<BloodRequests />} />
+            <Route path="/create-request" element={<CreateRequest />} />
             {/* <Route path="/products" element={<Products />} />
-            <Route path="/create-request" element={<Home />} />
             <Route path="/about-us" element={<Home />} /> */}
           </Routes>
         </div>

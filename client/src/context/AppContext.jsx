@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { INITIAL_REQUESTS_DATA } from "../data/data";
 
 const AppContext = createContext();
 
@@ -8,6 +9,32 @@ export const AppProvider = ({ children }) => {
     const savedTheme = localStorage.getItem("lifelink_dark_mode");
     return savedTheme !== null ? JSON.parse(savedTheme) : false;
   });
+
+  const [requests, setRequests] = useState(INITIAL_REQUESTS_DATA);
+
+  const addBloodRequest = (newReq) => {
+    const formatted = {
+      id: `LRH-${Math.floor(1000 + Math.random() * 9000)}`,
+      bloodGroup: newReq.bloodGroup,
+      rhType: newReq.bloodGroup?.includes("+") ? "Rh Pos" : "Rh Neg",
+      units: Number(newReq.unitsCount),
+      department: newReq.clinicalDepartment || "General Care",
+      hospital: newReq.hospitalName,
+      district: newReq.district,
+      deadline: `Required by ${newReq.requiredDate}`,
+      remainingTime:
+        newReq.urgencyLevel === "critical" ? "6h remaining" : "24h remaining",
+      status: newReq.urgencyLevel === "critical" ? "urgent" : "open",
+      urgencyText:
+        newReq.urgencyLevel === "critical"
+          ? "Urgent - Critical"
+          : "Open Request",
+      verifiedBy: "Dr. Sarah Vance",
+      donorsInfo: "Awaiting matching donor",
+    };
+
+    setRequests((prev) => [formatted, ...prev]);
+  };
 
   // Sync dark mode class with HTML element and update localStorage
   useEffect(() => {
@@ -30,6 +57,8 @@ export const AppProvider = ({ children }) => {
         isDarkMode,
         setIsDarkMode,
         toggleDarkMode,
+        requests,
+        addBloodRequest,
       }}
     >
       {children}

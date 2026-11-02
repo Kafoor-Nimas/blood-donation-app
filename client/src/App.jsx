@@ -1,13 +1,24 @@
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AppProvider } from "./context/AppContext";
+import Home from "./pages/Home";
+// import Products from "./pages/Products";
 
-const App = () => {
+export default function App() {
   return (
-    <div>
-      <div>
-        <h1 className="text-3xl font-bold underline ">Hello world!</h1>
-      </div>
-    </div>
+    <AppProvider>
+      <Router>
+        <div className="min-h-screen flex flex-col">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            {/* <Route path="/products" element={<Products />} />
+            <Route path="/find-donors" element={<Home />} />
+            <Route path="/blood-requests" element={<Home />} />
+            <Route path="/create-request" element={<Home />} />
+            <Route path="/about-us" element={<Home />} /> */}
+          </Routes>
+        </div>
+      </Router>
+    </AppProvider>
   );
-};
-
-export default App;
+}

@@ -1,4 +1,5 @@
 import { useApp } from "../context/AppContext";
+import img from "../assets/WhyLifeLink.jfif";
 
 export default function WhyLifeLink() {
   const { isDarkMode } = useApp();
@@ -42,7 +43,7 @@ export default function WhyLifeLink() {
             }`}
           >
             <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwz2kTBYdC2gwzA-POt_-CSeuBIjz1IRRAjiGb4DQ2gkUCm1MmEHmZDfe43TlS9VjGw_r5_1rQWQ4p4TdItO6zGBDDM3hAUfTtpiEY3TqO2rRfuXnPYZicyAnDD3gyUWCjeOYtnmFCvcg5BU4chBR07yu1oMuZrWDpPHqoze5auOsFY3UdwoqqYJWFmIx2j5Q1QXEDVEB_z0EzOz25x93J4fN-sP7nY7Y2gtVTKOAN"
+              src={img}
               alt="Healthcare workers and donors"
               className="w-full h-[400px] lg:h-[460px] object-cover object-center"
             />

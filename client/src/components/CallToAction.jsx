@@ -3,8 +3,8 @@ import React from "react";
 export default function CallToAction() {
   return (
     <section className="max-w-[1600px] mx-auto px-6 lg:px-12 pb-20 w-full">
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#b70011] via-[#dc2626] to-[#b70011] text-white p-8 lg:p-14 shadow-xl">
-        <div className="relative z-10 max-w-3xl flex flex-col items-start gap-6">
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#b70011] via-[#dc2626] to-[#b70011] text-white p-8 lg:p-14 lg:px-30 shadow-xl">
+        <div className="relative z-10 max-w-4xl flex flex-col items-start gap-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs uppercase font-semibold">
             <span className="material-symbols-outlined !text-[16px]">
               favorite

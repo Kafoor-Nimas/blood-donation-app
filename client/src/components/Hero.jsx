@@ -1,4 +1,5 @@
 import { useApp } from "../context/AppContext";
+import img from "../assets/hero1.jfif";
 
 export default function Hero() {
   const { isDarkMode } = useApp();
@@ -137,7 +138,7 @@ export default function Hero() {
               }`}
             >
               <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgqil_HbCWz2E9e7BOXHyCYkeKjD87ODgEd0uwx_nzRa8b-o3ztte04Zpu-nubujxs1aIt_grYwX60jpCfcZ9FFgmD2Erl6uTfFN78hX-kGGMPA3wwe2vU7wBYThQ5UNje0jXOPxL2h0pypAzx9AJl5cdsIh-9dXxXcTdwH3kA8Ip-K6fzuqMGMKBS3uJNG9qqkYqJ2M8J5WJZveFE3EDobWKcnne8hWHA678HWLjH"
+                src={img}
                 alt="Donation in progress"
                 className="w-full h-[420px] lg:h-[480px] object-cover object-center transform hover:scale-105 transition-transform duration-700"
               />

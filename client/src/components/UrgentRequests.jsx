@@ -76,7 +76,7 @@ export default function UrgentRequests() {
         </a>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {requests.map((req, idx) => (
           <div
             key={idx}

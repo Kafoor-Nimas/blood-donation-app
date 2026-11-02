@@ -38,7 +38,7 @@ export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
               className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
                 isDarkMode
                   ? "bg-[#334155] text-[#F8FAFC]"
-                  : "bg-slate-100 text-slate-700"
+                  : "bg-blue-50 text-slate-700"
               }`}
             >
               <span className="material-symbols-outlined !text-[14px]">
@@ -170,7 +170,7 @@ export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
           className={`h-10 px-3 rounded-xl font-semibold text-xs flex items-center justify-center transition-colors border ${
             isDarkMode
               ? "bg-[#111827] border-[#334155] text-[#F8FAFC] hover:bg-[#334155]"
-              : "bg-slate-100 border-slate-200 text-[#0b1c30] hover:bg-slate-200"
+              : "bg-blue-50 border-slate-200 text-[#0b1c30] hover:bg-slate-200"
           }`}
         >
           <span className="material-symbols-outlined !text-[18px]">badge</span>

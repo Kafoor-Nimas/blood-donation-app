@@ -58,7 +58,7 @@ export const INITIAL_DONORS_DATA = [
     id: 4,
     name: "Dr. Ruwan Alwis",
     group: "AB-",
-    rhType: "Rare Group",
+    rhType: "Rare",
     district: "Colombo",
     city: "Sri Jayewardenepura",
     location: "Colombo • Sri Jayewardenepura",

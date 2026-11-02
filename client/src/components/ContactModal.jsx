@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { useApp } from "../context/AppContext";
 
 export default function ContactModal({ donor, onClose }) {
@@ -12,7 +12,7 @@ export default function ContactModal({ donor, onClose }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     alert(
-      `Contact request for ${donor.name} dispatched via encrypted LifeLink IVR pipeline.`
+      `Contact request for ${donor.name} dispatched via encrypted LifeLink IVR pipeline.`,
     );
     onClose();
   };
@@ -30,7 +30,7 @@ export default function ContactModal({ donor, onClose }) {
           type="button"
           onClick={onClose}
           className={`absolute right-5 top-5 p-1 rounded-lg transition-colors ${
-            isDarkMode ? "hover:bg-[#334155]" : "hover:bg-slate-100"
+            isDarkMode ? "hover:bg-[#334155]" : "hover:bg-blue-50"
           }`}
         >
           <span className="material-symbols-outlined !text-[20px]">close</span>
@@ -86,7 +86,7 @@ export default function ContactModal({ donor, onClose }) {
               className={`w-full h-11 px-3 rounded-xl text-xs font-medium focus:outline-none border ${
                 isDarkMode
                   ? "bg-[#111827] border-[#334155] text-[#F8FAFC]"
-                  : "bg-slate-100 border-slate-200 text-[#0b1c30]"
+                  : "bg-blue-50 border-slate-200 text-[#0b1c30]"
               }`}
             >
               <option value="">Select your active blood request...</option>
@@ -123,7 +123,7 @@ export default function ContactModal({ donor, onClose }) {
                     className={`p-2 text-center rounded-xl text-xs font-semibold transition-colors border ${
                       isDarkMode
                         ? "bg-[#111827] border-[#334155] peer-checked:bg-[#b70011] peer-checked:text-white"
-                        : "bg-slate-100 border-slate-200 peer-checked:bg-[#b70011] peer-checked:text-white"
+                        : "bg-blue-50 border-slate-200 peer-checked:bg-[#b70011] peer-checked:text-white"
                     }`}
                   >
                     {item.label}
@@ -145,7 +145,7 @@ export default function ContactModal({ donor, onClose }) {
               className={`w-full p-3 rounded-xl text-xs focus:outline-none resize-none border ${
                 isDarkMode
                   ? "bg-[#111827] border-[#334155] text-[#F8FAFC]"
-                  : "bg-slate-100 border-slate-200 text-[#0b1c30]"
+                  : "bg-blue-50 border-slate-200 text-[#0b1c30]"
               }`}
             />
           </div>
@@ -157,7 +157,7 @@ export default function ContactModal({ donor, onClose }) {
               className={`w-1/2 h-11 rounded-xl text-xs font-semibold transition-colors border ${
                 isDarkMode
                   ? "bg-[#111827] border-[#334155] text-[#CBD5E1] hover:bg-[#334155]"
-                  : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200"
+                  : "bg-blue-50 border-slate-200 text-slate-700 hover:bg-slate-200"
               }`}
             >
               Cancel

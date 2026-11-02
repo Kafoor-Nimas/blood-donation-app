@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AppProvider } from "./context/AppContext";
 import Home from "./pages/Home";
 import FindDonors from "./pages/FindDonors";
+import BloodRequests from "./pages/BloodRequests";
 // import Products from "./pages/Products";
 
 export default function App() {
@@ -13,8 +14,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/find-donors" element={<FindDonors />} />
+            <Route path="/blood-requests" element={<BloodRequests />} />
             {/* <Route path="/products" element={<Products />} />
-            <Route path="/blood-requests" element={<Home />} />
             <Route path="/create-request" element={<Home />} />
             <Route path="/about-us" element={<Home />} /> */}
           </Routes>

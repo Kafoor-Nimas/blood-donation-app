@@ -4,7 +4,7 @@ import LiveDispatchBanner from "../components/LiveDispatchBanner";
 import Hero from "../components/Hero";
 import QuickActionCards from "../components/QuickActionCards";
 import ImpactStats from "../components/ImpactStats";
-// import BloodGroupMatrix from "../components/BloodGroupMatrix";
+import BloodGroupMatrix from "../components/BloodGroupMatrix";
 // import HowItWorks from "../components/HowItWorks";
 // import UrgentRequests from "../components/UrgentRequests";
 // import WhyLifeLink from "../components/WhyLifeLink";
@@ -30,9 +30,9 @@ export default function Home() {
         <LiveDispatchBanner />
         <Hero />
         <QuickActionCards />
-          <ImpactStats />
-       {/* <BloodGroupMatrix />
-        <HowItWorks />
+        <ImpactStats />
+        <BloodGroupMatrix />
+        {/*  <HowItWorks />
         <UrgentRequests />
         <WhyLifeLink />
         <Testimonials />

@@ -7,7 +7,7 @@ import ImpactStats from "../components/ImpactStats";
 import BloodGroupMatrix from "../components/BloodGroupMatrix";
 import HowItWorks from "../components/HowItWorks";
 import UrgentRequests from "../components/UrgentRequests";
-// import WhyLifeLink from "../components/WhyLifeLink";
+import WhyLifeLink from "../components/WhyLifeLink";
 // import Testimonials from "../components/Testimonials";
 // import CallToAction from "../components/CallToAction";
 import Footer from "../components/Footer";
@@ -34,8 +34,8 @@ export default function Home() {
         <BloodGroupMatrix />
         <HowItWorks />
         <UrgentRequests />
-        {/* <WhyLifeLink />
-        <Testimonials />
+         <WhyLifeLink />
+       {/* <Testimonials />
         <CallToAction /> */}
       </main>
       <Footer />

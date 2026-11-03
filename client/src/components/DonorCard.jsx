@@ -3,6 +3,15 @@ import { useApp } from "../context/AppContext";
 export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
   const { isDarkMode } = useApp();
 
+  // Normalize backend MongoDB fields vs mock data fields
+  const bloodGroup = donor?.bloodGroup || donor?.group || "O+";
+  const isAvailable = donor?.isAvailable ?? donor?.available ?? true;
+  const status = donor?.status || (isAvailable ? "Available" : "In Cooldown");
+  const badge = donor?.badge || donor?.role || "Verified Donor";
+  const location = donor?.district || donor?.location || donor?.city || "Colombo";
+  const lastDonated = donor?.lastDonated || "Recently";
+  const preferredCenters = donor?.preferredCenters || `${location} General Hospital`;
+
   return (
     <div
       className={`rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group border ${
@@ -15,22 +24,22 @@ export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
         {/* Header Badges */}
         <div className="flex items-start justify-between gap-3">
           <div className="w-14 h-14 rounded-2xl bg-[#ffdad6] text-[#b70011] flex flex-col items-center justify-center font-bold text-xl leading-tight shadow-md flex-shrink-0 group-hover:scale-105 transition-transform">
-            <span>{donor.group}</span>
+            <span>{bloodGroup}</span>
             <span className="text-[9px] uppercase tracking-wider font-semibold opacity-80">
-              {donor.rhType}
+              {donor?.rhType || "Rh+"}
             </span>
           </div>
 
           <div className="flex flex-col items-end gap-1.5">
-            {donor.available ? (
+            {isAvailable ? (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#008438]/10 text-[#008438] text-xs font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#008438] animate-pulse" />
-                <span>{donor.status}</span>
+                <span>{status}</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ffdad6] text-[#93000a] text-xs font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a]" />
-                <span>{donor.status}</span>
+                <span>{status}</span>
               </span>
             )}
 
@@ -44,7 +53,7 @@ export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
               <span className="material-symbols-outlined !text-[14px]">
                 military_tech
               </span>
-              <span>{donor.badge}</span>
+              <span>{badge}</span>
             </span>
           </div>
         </div>
@@ -57,7 +66,7 @@ export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
                 isDarkMode ? "text-[#F8FAFC]" : "text-[#0b1c30]"
               }`}
             >
-              {donor.name}
+              {donor?.name || "Anonymous Donor"}
             </h3>
             <span
               className="material-symbols-outlined text-[#008438] !text-[18px]"
@@ -74,7 +83,7 @@ export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
             <span className="material-symbols-outlined !text-[16px] text-[#b70011]">
               location_on
             </span>
-            <span>{donor.location}</span>
+            <span>{location}</span>
           </p>
         </div>
 
@@ -95,26 +104,26 @@ export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
                 isDarkMode ? "text-[#F8FAFC]" : "text-[#0b1c30]"
               }`}
             >
-              {donor.lastDonated}
+              {lastDonated}
             </span>
           </div>
 
           <div className="flex items-center justify-between text-xs">
             <span className={isDarkMode ? "text-[#94A3B8]" : "text-slate-500"}>
-              {donor.available ? "Preferred Centers" : "Recovery Period"}
+              {isAvailable ? "Preferred Centers" : "Recovery Period"}
             </span>
             <span
               className={`font-semibold ${
-                donor.available
+                isAvailable
                   ? isDarkMode
                     ? "text-[#F8FAFC]"
                     : "text-[#0b1c30]"
                   : "text-[#ba1a1a]"
               }`}
             >
-              {donor.available
-                ? donor.preferredCenters
-                : `${donor.recoveryProgress} Completed`}
+              {isAvailable
+                ? preferredCenters
+                : `${donor?.recoveryProgress || "80%"} Completed`}
             </span>
           </div>
 
@@ -125,10 +134,10 @@ export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
           >
             <div
               className={`h-full rounded-full ${
-                donor.available ? "bg-[#008438] w-full" : "bg-[#b70011]"
+                isAvailable ? "bg-[#008438] w-full" : "bg-[#b70011]"
               }`}
               style={{
-                width: donor.available ? "100%" : donor.recoveryProgress,
+                width: isAvailable ? "100%" : donor?.recoveryProgress || "80%",
               }}
             />
           </div>
@@ -137,11 +146,11 @@ export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
 
       {/* Card Action Buttons */}
       <div className="pt-5 mt-4 flex items-center gap-2.5">
-        {donor.available ? (
+        {isAvailable ? (
           <button
             type="button"
-            onClick={() => onRequestContact(donor)}
-            className="flex-1 h-10 px-3 rounded-xl bg-[#b70011] text-white font-semibold text-xs hover:brightness-110 flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+            onClick={() => onRequestContact && onRequestContact(donor)}
+            className="flex-1 h-10 px-3 rounded-xl bg-[#b70011] text-white font-semibold text-xs hover:brightness-110 flex items-center justify-center gap-1.5 transition-colors shadow-sm cursor-pointer"
           >
             <span className="material-symbols-outlined !text-[18px]">send</span>
             <span>Request Contact</span>
@@ -166,8 +175,8 @@ export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
         <button
           type="button"
           title="View Verified Credentials"
-          onClick={() => onViewProfile(donor)}
-          className={`h-10 px-3 rounded-xl font-semibold text-xs flex items-center justify-center transition-colors border ${
+          onClick={() => onViewProfile && onViewProfile(donor)}
+          className={`h-10 px-3 rounded-xl font-semibold text-xs flex items-center justify-center transition-colors border cursor-pointer ${
             isDarkMode
               ? "bg-[#111827] border-[#334155] text-[#F8FAFC] hover:bg-[#334155]"
               : "bg-blue-50 border-slate-200 text-[#0b1c30] hover:bg-slate-200"

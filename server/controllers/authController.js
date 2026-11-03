@@ -4,14 +4,24 @@ import bcrypt from "bcryptjs";
 
 export const registerUser = async (req, res) => {
   try {
-    // 1. Destructure district and set fallbacks
-    const { name, email, password, role, bloodGroup, district, phone } =
+    const { name, email, password, role, bloodGroup, district, phone, city } =
       req.body;
 
+    // 1. Core validation
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
         message: "Name, email, and password are required",
+      });
+    }
+
+    const userRole = role || "Donor";
+
+    // 2. Role-specific validation
+    if (userRole === "Donor" && (!bloodGroup || !phone)) {
+      return res.status(400).json({
+        success: false,
+        message: "Blood group and phone number are required for Donors",
       });
     }
 
@@ -25,18 +35,25 @@ export const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 2. Fixed logical OR operator (||) for default role
+    // 3. Fallbacks to prevent Mongoose Schema validation error
+    const validBloodGroup =
+      bloodGroup &&
+      ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].includes(bloodGroup)
+        ? bloodGroup
+        : "O+";
+
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      role: role || "Requester",
-      bloodGroup,
+      role: userRole,
+      bloodGroup: validBloodGroup,
       district: district || "Colombo",
-      phone,
+      city: city || district || "Colombo",
+      phone: phone || "N/A", // Prevents empty string breaking required check
+      isAvailable: true,
     });
 
-    // 3. Fallback JWT secret to prevent runtime crash
     const jwtSecret =
       process.env.JWT_SECRET || "lifelink_fallback_jwt_secret_key_2026";
 
@@ -44,25 +61,22 @@ export const registerUser = async (req, res) => {
       expiresIn: "7d",
     });
 
+    // 4. Convert to JSON object to include virtuals
+    const userObj = user.toJSON();
+    delete userObj.password;
+
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        bloodGroup: user.bloodGroup,
-        district: user.district,
-      },
+      user: userObj,
       token,
     });
   } catch (error) {
-    console.error("Register Error:", error);
+    console.error("Register Error Details:", error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error during registration",
-      error: error.message,
+      message: error.message || "Internal server error during registration",
+      error: error.name === "ValidationError" ? error.errors : error.message,
     });
   }
 };
@@ -103,17 +117,13 @@ export const loginUser = async (req, res) => {
       expiresIn: "7d",
     });
 
+    const userObj = user.toJSON();
+    delete userObj.password;
+
     return res.status(200).json({
       success: true,
       message: "Login Successful",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        bloodGroup: user.bloodGroup,
-        district: user.district,
-      },
+      user: userObj,
       token,
     });
   } catch (error) {

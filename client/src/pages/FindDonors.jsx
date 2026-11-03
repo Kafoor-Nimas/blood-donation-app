@@ -1,14 +1,20 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import DonorCard from "../components/DonorCard";
 import ContactModal from "../components/ContactModal";
 import ProfileModal from "../components/ProfileModal";
 import { useApp } from "../context/AppContext";
+import API from "../services/api";
 import { INITIAL_DONORS_DATA } from "../data/data";
 
 export default function FindDonors() {
   const { isDarkMode } = useApp();
+
+  // Data & API States
+  const [donors, setDonors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Filter States
   const [activeGroup, setActiveGroup] = useState("ALL");
@@ -20,24 +26,61 @@ export default function FindDonors() {
   const [contactDonor, setContactDonor] = useState(null);
   const [profileDonor, setProfileDonor] = useState(null);
 
-  // Filter Logic
+  // 1. Fetch Donors from Backend API
+  const fetchDonors = async () => {
+    setLoading(true);
+    setErrorMessage("");
+    try {
+      const response = await API.get("/donors");
+      
+      // Extract array payload safely whether wrapped or direct
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data?.donors || response.data?.data || INITIAL_DONORS_DATA;
+        
+      setDonors(data);
+    } catch (error) {
+      console.error("Failed to fetch donor directory:", error);
+      setErrorMessage("Could not load live donor network. Showing cached results.");
+      // Fallback to initial mock data on error so UI remains responsive
+      setDonors(INITIAL_DONORS_DATA || []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDonors();
+  }, []);
+
+  // 2. Filter Logic (Applies to fetched API donor array)
   const filteredDonors = useMemo(() => {
-    return INITIAL_DONORS_DATA.filter((donor) => {
-      if (activeGroup !== "ALL" && donor.group !== activeGroup) return false;
+    const list = Array.isArray(donors) ? donors : [];
+
+    return list.filter((donor) => {
+      // Blood Group filter matching either 'group' or 'bloodGroup' keys
+      const donorGroup = donor.group || donor.bloodGroup;
+      if (activeGroup !== "ALL" && donorGroup !== activeGroup) return false;
+
+      // District filter
       if (activeDistrict !== "ALL" && donor.district !== activeDistrict)
         return false;
-      if (showAvailableOnly && !donor.available) return false;
 
+      // Availability filter
+      const isAvailable = donor.available !== undefined ? donor.available : donor.isAvailable;
+      if (showAvailableOnly && !isAvailable) return false;
+
+      // City / Location Free Search
       if (searchQuery.trim() !== "") {
         const query = searchQuery.toLowerCase();
         const fullText =
-          `${donor.name} ${donor.location} ${donor.city} ${donor.facility}`.toLowerCase();
+          `${donor.name || ""} ${donor.location || ""} ${donor.city || ""} ${donor.facility || ""}`.toLowerCase();
         if (!fullText.includes(query)) return false;
       }
 
       return true;
     });
-  }, [activeGroup, activeDistrict, searchQuery, showAvailableOnly]);
+  }, [donors, activeGroup, activeDistrict, searchQuery, showAvailableOnly]);
 
   const resetAllFilters = () => {
     setActiveGroup("ALL");
@@ -101,6 +144,25 @@ export default function FindDonors() {
               <span>SLMC &amp; NBTS Compliant</span>
             </div>
           </div>
+
+          {/* API Error Notification */}
+          {errorMessage && (
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-semibold flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined !text-[20px]">
+                  warning
+                </span>
+                <span>{errorMessage}</span>
+              </div>
+              <button
+                type="button"
+                onClick={fetchDonors}
+                className="px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 transition-colors text-xs font-bold"
+              >
+                Retry Live Fetch
+              </button>
+            </div>
+          )}
 
           {/* Title & Stats Header */}
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
@@ -225,12 +287,12 @@ export default function FindDonors() {
                       key={grp}
                       type="button"
                       onClick={() => setActiveGroup(grp)}
-                      className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                      className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                         activeGroup === grp
                           ? "bg-[#b70011] text-white shadow-sm"
                           : isDarkMode
-                            ? "bg-[#111827] text-[#CBD5E1] hover:bg-[#334155]"
-                            : "bg-blue-50 text-slate-700 hover:bg-slate-200"
+                          ? "bg-[#111827] text-[#CBD5E1] hover:bg-[#334155]"
+                          : "bg-blue-50 text-slate-700 hover:bg-slate-200"
                       }`}
                     >
                       {grp === "ALL" ? "All Groups" : grp}
@@ -326,7 +388,7 @@ export default function FindDonors() {
                 <button
                   type="button"
                   onClick={resetAllFilters}
-                  className={`w-full h-11 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors border ${
+                  className={`w-full h-11 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors border cursor-pointer ${
                     isDarkMode
                       ? "bg-[#111827] border-[#334155] text-[#F8FAFC] hover:bg-[#334155]"
                       : "bg-blue-50 border-slate-200 text-[#0b1c30] hover:bg-slate-200"
@@ -421,8 +483,19 @@ export default function FindDonors() {
             )}
           </div>
 
-          {/* Donors Grid or Empty State */}
-          {filteredDonors.length === 0 ? (
+          {/* Donors Grid Loading Skeleton / Content / Empty State */}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div
+                  key={i}
+                  className={`h-64 rounded-2xl animate-pulse border ${
+                    isDarkMode ? "bg-[#1E293B] border-[#334155]" : "bg-slate-200 border-slate-100"
+                  }`}
+                />
+              ))}
+            </div>
+          ) : filteredDonors.length === 0 ? (
             <div
               className={`rounded-2xl p-12 text-center shadow-sm max-w-xl mx-auto my-8 space-y-4 border ${
                 isDarkMode
@@ -449,7 +522,7 @@ export default function FindDonors() {
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="h-10 px-6 rounded-xl bg-[#b70011] text-white font-semibold text-xs hover:brightness-110 transition-colors inline-flex items-center gap-2"
+                className="h-10 px-6 rounded-xl bg-[#b70011] text-white font-semibold text-xs hover:brightness-110 transition-colors inline-flex items-center gap-2 cursor-pointer"
               >
                 <span className="material-symbols-outlined !text-[18px]">
                   restart_alt
@@ -461,7 +534,7 @@ export default function FindDonors() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredDonors.map((donor) => (
                 <DonorCard
-                  key={donor.id}
+                  key={donor.id || donor._id}
                   donor={donor}
                   onRequestContact={(d) => setContactDonor(d)}
                   onViewProfile={(d) => setProfileDonor(d)}
@@ -481,7 +554,7 @@ export default function FindDonors() {
             <div className="flex items-center gap-3 text-xs">
               <span>
                 Showing <strong>1-{filteredDonors.length}</strong> of{" "}
-                <strong>142</strong> Registered Donors
+                <strong>{donors.length}</strong> Registered Donors
               </span>
               <span className="hidden md:inline">•</span>
               <div className="hidden md:flex items-center gap-1.5">
@@ -515,31 +588,6 @@ export default function FindDonors() {
                 className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs bg-[#b70011] text-white shadow-sm"
               >
                 1
-              </button>
-              <button
-                type="button"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs transition-colors ${
-                  isDarkMode ? "hover:bg-[#334155]" : "hover:bg-blue-50"
-                }`}
-              >
-                2
-              </button>
-              <button
-                type="button"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs transition-colors ${
-                  isDarkMode ? "hover:bg-[#334155]" : "hover:bg-blue-50"
-                }`}
-              >
-                3
-              </button>
-              <span className="px-1 text-xs opacity-50">...</span>
-              <button
-                type="button"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs transition-colors ${
-                  isDarkMode ? "hover:bg-[#334155]" : "hover:bg-blue-50"
-                }`}
-              >
-                12
               </button>
               <button
                 type="button"

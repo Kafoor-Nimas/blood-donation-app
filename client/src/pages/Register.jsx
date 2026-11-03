@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -13,6 +13,7 @@ export default function Register() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [role, setRole] = useState("Donor"); // Role input state (Donor or Requester)
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [bloodGroup, setBloodGroup] = useState("A+");
@@ -62,7 +63,7 @@ export default function Register() {
     setIsSubmitting(true);
 
     try {
-      // Live API Call to Backend
+      // Live API Call to Backend with selected role
       const response = await API.post("/auth/register", {
         name: fullName,
         email,
@@ -70,7 +71,7 @@ export default function Register() {
         password,
         bloodGroup,
         district,
-        role: "Requester",
+        role,
       });
 
       const { token, user } = response.data;
@@ -279,6 +280,57 @@ export default function Register() {
 
                 {/* Registration Form */}
                 <form className="space-y-4" onSubmit={handleSubmit}>
+                  {/* Account Role Selector */}
+                  <div className="flex flex-col gap-1.5">
+                    <label
+                      className={`text-xs font-semibold ${
+                        isDarkMode ? "text-[#F8FAFC]" : "text-[#0b1c30]"
+                      }`}
+                    >
+                      Registering As
+                    </label>
+                    <div
+                      className={`grid grid-cols-2 p-1 rounded-xl border ${
+                        isDarkMode
+                          ? "bg-[#111827] border-[#334155]"
+                          : "bg-slate-100 border-slate-200"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setRole("Donor")}
+                        className={`py-2 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          role === "Donor"
+                            ? "bg-[#dc2626] text-white shadow-sm"
+                            : isDarkMode
+                              ? "text-slate-400 hover:text-white"
+                              : "text-slate-600 hover:text-[#0b1c30]"
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">
+                          favorite
+                        </span>
+                        <span>Donor</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRole("Requester")}
+                        className={`py-2 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          role === "Requester"
+                            ? "bg-[#dc2626] text-white shadow-sm"
+                            : isDarkMode
+                              ? "text-slate-400 hover:text-white"
+                              : "text-slate-600 hover:text-[#0b1c30]"
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">
+                          clinical_notes
+                        </span>
+                        <span>Requester</span>
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Full Name */}
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">

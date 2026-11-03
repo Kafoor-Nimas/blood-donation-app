@@ -1,8 +1,29 @@
-import { Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 
 export default function Navbar() {
   const { isDarkMode, setIsDarkMode, user, isAuthenticated, logout } = useApp();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const navigate = useNavigate();
+
+  // Close dropdown when clicking anywhere outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    setDropdownOpen(false);
+    if (logout) logout();
+    navigate("/login");
+  };
 
   return (
     <header
@@ -101,10 +122,14 @@ export default function Navbar() {
             }`}
           >
             {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <Link
-                  to="/profile"
-                  className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+              <div className="relative" ref={dropdownRef}>
+                {/* User Dropdown Trigger */}
+                <button
+                  type="button"
+                  onClick={() => setDropdownOpen((prev) => !prev)}
+                  className={`flex items-center gap-2 p-1 rounded-xl transition-all cursor-pointer ${
+                    isDarkMode ? "hover:bg-[#1E293B]" : "hover:bg-slate-100"
+                  }`}
                 >
                   <img
                     src={
@@ -120,29 +145,100 @@ export default function Navbar() {
                         isDarkMode ? "text-[#F8FAFC]" : "text-[#0b1c30]"
                       }`}
                     >
-                      {user?.name || "Dr. Sarah Vance"}
+                      {user?.name || "User"}
                     </span>
                     <span className="text-[10px] text-[#b70011] uppercase font-bold tracking-wider">
-                      {user?.role || "Requester"}
+                      {user?.role || "Donor"}
                     </span>
                   </div>
-                </Link>
-
-                {/* Optional Logout Action */}
-                {logout && (
-                  <button
-                    onClick={logout}
-                    title="Sign Out"
-                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                      isDarkMode
-                        ? "text-slate-400 hover:text-red-400 hover:bg-[#1E293B]"
-                        : "text-slate-500 hover:text-red-600 hover:bg-slate-100"
+                  <span
+                    className={`material-symbols-outlined !text-[18px] transition-transform duration-200 ${
+                      dropdownOpen ? "rotate-180" : ""
                     }`}
                   >
-                    <span className="material-symbols-outlined !text-[18px]">
-                      logout
-                    </span>
-                  </button>
+                    expand_more
+                  </span>
+                </button>
+
+                {/* Dropdown Menu */}
+                {dropdownOpen && (
+                  <div
+                    className={`absolute right-0 mt-2 w-56 rounded-2xl shadow-xl py-2 border z-50 transition-all ${
+                      isDarkMode
+                        ? "bg-[#1E293B] border-[#334155] text-[#F8FAFC]"
+                        : "bg-white border-slate-100 text-[#0b1c30]"
+                    }`}
+                  >
+                    {/* User Header Info in Menu */}
+                    <div className="px-4 py-2 border-b border-slate-100 dark:border-[#334155]">
+                      <p className="text-xs font-bold truncate">{user?.name || "User"}</p>
+                      <p className="text-[10px] text-slate-400 truncate">{user?.email || ""}</p>
+                    </div>
+
+                    <div className="py-1">
+                      {/* Profile Link */}
+                      <Link
+                        to="/profile"
+                        onClick={() => setDropdownOpen(false)}
+                        className={`flex items-center gap-2.5 px-4 py-2 text-xs font-semibold transition-colors ${
+                          isDarkMode
+                            ? "hover:bg-[#111827] text-slate-200"
+                            : "hover:bg-slate-50 text-slate-700"
+                        }`}
+                      >
+                        <span className="material-symbols-outlined !text-[18px]">
+                          account_circle
+                        </span>
+                        <span>Profile</span>
+                      </Link>
+
+                      {/* Admin Dashboard Link */}
+                      <Link
+                        to="/admin"
+                        onClick={() => setDropdownOpen(false)}
+                        className={`flex items-center gap-2.5 px-4 py-2 text-xs font-semibold transition-colors ${
+                          isDarkMode
+                            ? "hover:bg-[#111827] text-slate-200"
+                            : "hover:bg-slate-50 text-slate-700"
+                        }`}
+                      >
+                        <span className="material-symbols-outlined !text-[18px] text-amber-500">
+                          admin_panel_settings
+                        </span>
+                        <span>Admin Dashboard</span>
+                      </Link>
+
+                      {/* Create Blood Request Link */}
+                      <Link
+                        to="/create-request"
+                        onClick={() => setDropdownOpen(false)}
+                        className={`flex items-center gap-2.5 px-4 py-2 text-xs font-semibold transition-colors ${
+                          isDarkMode
+                            ? "hover:bg-[#111827] text-slate-200"
+                            : "hover:bg-slate-50 text-slate-700"
+                        }`}
+                      >
+                        <span className="material-symbols-outlined !text-[18px] text-[#b70011]">
+                          add_circle
+                        </span>
+                        <span>Create Blood Request</span>
+                      </Link>
+                    </div>
+
+                    {/* Log Out Button */}
+                    <div className="pt-1 border-t border-slate-100 dark:border-[#334155]">
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-500/10 transition-colors text-left"
+                      >
+                        <span className="material-symbols-outlined !text-[18px]">
+                          logout
+                        </span>
+                        <span>Log Out</span>
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             ) : (

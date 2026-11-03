@@ -8,9 +8,10 @@ import PatientDetailsSection from "../components/create-request/PatientDetailsSe
 import HospitalLocationSection from "../components/create-request/HospitalLocationSection";
 import ScheduleUrgencySection from "../components/create-request/ScheduleUrgencySection";
 import { useApp } from "../context/AppContext";
+import API from "../services/api";
 
 export default function CreateRequest() {
-  const { isDarkMode } = useApp();
+  const { isDarkMode, fetchRequests } = useApp();
   const navigate = useNavigate();
 
   // Form State
@@ -26,6 +27,11 @@ export default function CreateRequest() {
   const [requiredDate, setRequiredDate] = useState("");
   const [requiredTime, setRequiredTime] = useState("");
   const [clinicalNotes, setClinicalNotes] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+
+  // Loading & Error states
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
@@ -38,27 +44,42 @@ export default function CreateRequest() {
     setRequiredTime(`${hours}:${minutes}`);
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setErrorMessage("");
 
-    // 1. Dispatch form values to context
-    addBloodRequest({
-      patientRef,
-      bloodGroup,
-      unitsCount,
-      clinicalDepartment,
-      hospitalName,
-      district,
-      city,
-      wardDesk,
-      urgencyLevel,
-      requiredDate,
-      requiredTime,
-      clinicalNotes,
-    });
+    try {
+      // Map UI state keys to Backend Controller schema expectations
+      const payload = {
+        patientName: patientRef || "Anonymous Patient",
+        bloodGroup,
+        unitsNeeded: Number(unitsCount),
+        hospitalName,
+        city: city || district,
+        urgency: urgencyLevel,
+        contactPhone: contactPhone || "N/A",
+      };
 
-    // 2. Navigate to Blood Requests page
-    navigate("/blood-requests");
+      // Axios automatically attaches authorization headers if configured in services/api.js
+      await API.post("/requests", payload);
+
+      // Refresh list in context if function exists
+      if (fetchRequests) {
+        await fetchRequests();
+      }
+
+      // Navigate to Blood Requests directory
+      navigate("/blood-requests");
+    } catch (error) {
+      console.error("Failed to post blood request:", error);
+      setErrorMessage(
+        error.response?.data?.message ||
+          "Failed to submit request. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -75,6 +96,12 @@ export default function CreateRequest() {
         <div className="w-full max-w-6xl mx-auto px-4 py-8">
           <BreadcrumbHeader />
           <InfoAlertBanner />
+
+          {errorMessage && (
+            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold">
+              {errorMessage}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <PatientDetailsSection
@@ -131,9 +158,10 @@ export default function CreateRequest() {
               </button>
               <button
                 type="submit"
-                className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#b70011] text-white font-semibold text-xs hover:brightness-110 shadow-md"
+                disabled={submitting}
+                className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#b70011] text-white font-semibold text-xs hover:brightness-110 shadow-md cursor-pointer disabled:opacity-50"
               >
-                Submit Blood Request
+                {submitting ? "Submitting Request..." : "Submit Blood Request"}
               </button>
             </div>
           </form>

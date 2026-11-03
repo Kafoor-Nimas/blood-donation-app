@@ -4,9 +4,7 @@ export default function AdminKpiCards() {
   const { isDarkMode } = useApp();
 
   const cardStyle = `p-6 rounded-xl shadow-sm border flex flex-col justify-between hover:shadow-md transition-all ${
-    isDarkMode
-      ? "bg-[#1E293B] border-[#334155]"
-      : "bg-white border-slate-100"
+    isDarkMode ? "bg-[#1E293B] border-[#334155]" : "bg-white border-slate-100"
   }`;
 
   return (
@@ -29,12 +27,22 @@ export default function AdminKpiCards() {
           >
             18,420
           </span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium">
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+              isDarkMode
+                ? "bg-[#0F172A] text-slate-300"
+                : "bg-slate-100 text-slate-700"
+            }`}
+          >
             +6.4% MoM
           </span>
         </div>
         <div className="space-y-1.5 pt-2">
-          <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden flex">
+          <div
+            className={`w-full h-2 rounded-full overflow-hidden flex ${
+              isDarkMode ? "bg-[#0F172A]" : "bg-slate-100"
+            }`}
+          >
             <div className="bg-[#dc2626] h-full" style={{ width: "84%" }} />
             <div className="bg-slate-400 h-full" style={{ width: "16%" }} />
           </div>
@@ -63,7 +71,13 @@ export default function AdminKpiCards() {
         </div>
         <div className="flex items-baseline gap-2 mb-2">
           <span className="text-3xl font-bold text-[#b70011]">48</span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-950/60 text-[#b70011] font-semibold animate-pulse">
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full font-semibold animate-pulse ${
+              isDarkMode
+                ? "bg-red-950/80 text-red-200"
+                : "bg-red-100 text-[#b70011]"
+            }`}
+          >
             12 Urgent
           </span>
         </div>
@@ -99,10 +113,16 @@ export default function AdminKpiCards() {
           <span className="text-sm text-slate-400 font-medium">Units</span>
         </div>
         <div className="flex items-center gap-2 pt-2">
-          <div className="flex-1 bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+          <div
+            className={`flex-1 h-2 rounded-full overflow-hidden ${
+              isDarkMode ? "bg-[#0F172A]" : "bg-slate-100"
+            }`}
+          >
             <div className="bg-[#008438] h-full" style={{ width: "78%" }} />
           </div>
-          <span className="text-xs text-[#008438] font-semibold">92% Target</span>
+          <span className="text-xs text-[#008438] font-semibold">
+            92% Target
+          </span>
         </div>
       </div>
 
@@ -125,7 +145,13 @@ export default function AdminKpiCards() {
             28
           </span>
           <span className="text-xl text-slate-400 font-normal">Min</span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-[#008438] font-semibold">
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
+              isDarkMode
+                ? "bg-emerald-950/80 text-emerald-200"
+                : "bg-emerald-100 text-[#008438]"
+            }`}
+          >
             -4m SLA
           </span>
         </div>

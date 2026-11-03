@@ -212,7 +212,13 @@ export default function AdminRequestTable() {
                       <span className="font-semibold text-[#b70011] text-sm">
                         {req.id}
                       </span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 dark:bg-red-950/60 text-[#b70011]">
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                          isDarkMode
+                            ? "bg-red-950/80 text-red-200"
+                            : "bg-red-100 text-[#b70011]"
+                        }`}
+                      >
                         {req.ward}
                       </span>
                     </div>
@@ -228,9 +234,15 @@ export default function AdminRequestTable() {
 
                 {/* Group & Units */}
                 <td className="py-4 px-4">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-red-50 dark:bg-red-950/40 text-[#b70011] font-bold text-base">
+                  <div
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded font-bold text-base ${
+                      isDarkMode
+                        ? "bg-red-950/50 text-red-300"
+                        : "bg-red-50 text-[#b70011]"
+                    }`}
+                  >
                     <span>{req.bloodGroup}</span>
-                    <span className="text-xs font-normal text-slate-500">
+                    <span className="text-xs font-normal text-slate-400">
                       / {req.units}
                     </span>
                   </div>
@@ -261,10 +273,16 @@ export default function AdminRequestTable() {
                     <span
                       className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] w-fit font-bold ${
                         req.isCritical
-                          ? "bg-red-100 dark:bg-red-950/80 text-[#b70011] animate-pulse"
+                          ? isDarkMode
+                            ? "bg-red-950/90 text-red-200 animate-pulse"
+                            : "bg-red-100 text-[#b70011] animate-pulse"
                           : req.status === "Fulfilled"
-                            ? "bg-emerald-100 dark:bg-emerald-950/80 text-[#008438]"
-                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                            ? isDarkMode
+                              ? "bg-emerald-950/90 text-emerald-200"
+                              : "bg-emerald-100 text-[#008438]"
+                            : isDarkMode
+                              ? "bg-[#0F172A] text-slate-300"
+                              : "bg-slate-100 text-slate-600"
                       }`}
                     >
                       <span className="material-symbols-outlined text-[13px]">
@@ -311,7 +329,11 @@ export default function AdminRequestTable() {
                   <div className="inline-flex items-center gap-1.5 justify-end">
                     <button
                       onClick={() => alert(`Details for ${req.id}`)}
-                      className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                      className={`p-1.5 rounded transition-colors cursor-pointer ${
+                        isDarkMode
+                          ? "hover:bg-[#0F172A] text-slate-400 hover:text-white"
+                          : "hover:bg-slate-100 text-slate-400 hover:text-slate-800"
+                      }`}
                       title="Review Details"
                     >
                       <span className="material-symbols-outlined text-[18px]">
@@ -322,7 +344,11 @@ export default function AdminRequestTable() {
                       onClick={() =>
                         handleStatusChange(req.id, "Under Coordination")
                       }
-                      className="p-1.5 rounded hover:bg-emerald-50 dark:hover:bg-emerald-950 text-[#008438] transition-colors cursor-pointer"
+                      className={`p-1.5 rounded transition-colors cursor-pointer ${
+                        isDarkMode
+                          ? "hover:bg-emerald-950/60 text-emerald-400"
+                          : "hover:bg-emerald-50 text-[#008438]"
+                      }`}
                       title="Approve & Dispatch"
                     >
                       <span className="material-symbols-outlined text-[18px]">
@@ -331,7 +357,11 @@ export default function AdminRequestTable() {
                     </button>
                     <button
                       onClick={() => handleStatusChange(req.id, "Fulfilled")}
-                      className="p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-950 text-[#b70011] transition-colors cursor-pointer"
+                      className={`p-1.5 rounded transition-colors cursor-pointer ${
+                        isDarkMode
+                          ? "hover:bg-red-950/60 text-red-400"
+                          : "hover:bg-red-50 text-[#b70011]"
+                      }`}
                       title="Mark Fulfilled"
                     >
                       <span className="material-symbols-outlined text-[18px]">
@@ -361,12 +391,22 @@ export default function AdminRequestTable() {
         <div className="flex items-center gap-2">
           <button
             disabled
-            className="px-3 py-1.5 rounded bg-white dark:bg-slate-800 text-slate-400 shadow-sm font-semibold opacity-50 cursor-not-allowed"
+            className={`px-3 py-1.5 rounded shadow-sm font-semibold opacity-50 cursor-not-allowed ${
+              isDarkMode
+                ? "bg-[#1E293B] text-slate-500"
+                : "bg-white text-slate-400"
+            }`}
           >
             Previous
           </button>
           <span className="px-2 font-bold">Page 1 of 12</span>
-          <button className="px-3 py-1.5 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-sm font-semibold hover:bg-slate-100 transition-colors cursor-pointer">
+          <button
+            className={`px-3 py-1.5 rounded shadow-sm font-semibold transition-colors cursor-pointer ${
+              isDarkMode
+                ? "bg-[#1E293B] text-slate-200 hover:bg-[#334155]"
+                : "bg-white text-slate-700 hover:bg-slate-100"
+            }`}
+          >
             Next
           </button>
         </div>

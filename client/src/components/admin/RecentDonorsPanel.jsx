@@ -7,7 +7,7 @@ const initialDonors = [
     name: "Chaminda Samarasinghe",
     bloodGroup: "O-",
     badge: "Medical Cleared",
-    badgeColor: "text-[#008438] bg-emerald-50 dark:bg-emerald-950/50",
+    badgeColor: "text-[#008438] bg-emerald-100 dark:bg-emerald-950/50",
     district: "Colombo District (Gampaha)",
     registeredTime: "Registered 12 min ago",
     active: true,
@@ -77,7 +77,7 @@ export default function RecentDonorsPanel() {
         </div>
         <button
           onClick={() => alert("Redirecting to full donor directory...")}
-          className="px-3 py-1.5 text-xs text-[#b70011] bg-red-50 dark:bg-red-950/40 hover:bg-red-100 rounded-lg font-semibold transition-colors cursor-pointer"
+          className={`px-3 py-1.5 text-xs text-[#b70011] ${isDarkMode ? "bg-red-950/40" : "bg-red-50"} hover:bg-red-100 rounded-lg font-semibold transition-colors cursor-pointer`}
         >
           View All Donors
         </button>
@@ -158,7 +158,7 @@ export default function RecentDonorsPanel() {
 
               <button
                 onClick={() => alert(`Manage options for ${donor.name}`)}
-                className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 transition-colors cursor-pointer"
+                className={`p-2 rounded-lg  ${isDarkMode ? "hover:bg-slate-800" : "bg-slate-200"}text-slate-400 transition-colors cursor-pointer`}
               >
                 <span className="material-symbols-outlined text-[18px]">
                   more_vert

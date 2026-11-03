@@ -16,7 +16,11 @@ export default function CommunitySolidarity() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Visual Container */}
           <div className="lg:col-span-6 relative">
-            <div className="overflow-hidden rounded-3xl border-4 border-white dark:border-[#334155] shadow-2xl aspect-[16/11] relative">
+            <div
+              className={`overflow-hidden rounded-3xl border-4 shadow-2xl aspect-[16/11] relative ${
+                isDarkMode ? "border-[#334155]" : "border-white"
+              }`}
+            >
               <img
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCS1tT-x4pBVNKW2yjRfzmOiRE9tCRUO35fo_OR2BruZ34SnOfAKWu7ymDI9rIZ-OWiM5mLxMndztnPxC3ROwXrGb63EjptR8yJ1VCVYMX-R-BVAXTcyAEcz9pulImCN1bsuaqtq6wm8_8_kVWJjloigtottIr8e8392TmsfZaJGAzCE292uaHVyid8b2S_YATs3WpBOkTnmV7iaG9Eikm8X5p8oMyAgdeUWppZYcDM"
                 alt="LifeLink Community Volunteers and Donors"
@@ -33,7 +37,13 @@ export default function CommunitySolidarity() {
                   : "bg-white/95 border-[#e6d1d1] text-[#1a0e0e]"
               }`}
             >
-              <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 flex items-center justify-center shrink-0">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                  isDarkMode
+                    ? "bg-emerald-950/60 text-emerald-300"
+                    : "bg-emerald-100 text-emerald-600"
+                }`}
+              >
                 <span className="material-symbols-outlined text-xl">
                   handshake
                 </span>
@@ -67,7 +77,13 @@ export default function CommunitySolidarity() {
 
           {/* Right Content */}
           <div className="lg:col-span-6 flex flex-col gap-6 pt-4 lg:pt-0">
-            <div className="inline-flex items-center gap-2 self-start rounded-full bg-red-100 dark:bg-red-950/60 px-3 py-1 border border-red-200 dark:border-red-900/60">
+            <div
+              className={`inline-flex items-center gap-2 self-start rounded-full px-3 py-1 border ${
+                isDarkMode
+                  ? "bg-red-950/60 border-red-900/60"
+                  : "bg-red-100 border-red-200"
+              }`}
+            >
               <span className="text-xs font-bold tracking-wider uppercase text-[#dc2626]">
                 The Power of Solidarity
               </span>
@@ -112,7 +128,11 @@ export default function CommunitySolidarity() {
                       : "bg-white border-[#f2e8e8]"
                   }`}
                 >
-                  <div className="w-8 h-8 rounded-xl bg-red-100 dark:bg-red-950/60 text-[#dc2626] flex items-center justify-center shrink-0 mt-0.5">
+                  <div
+                    className={`w-8 h-8 rounded-xl text-[#dc2626] flex items-center justify-center shrink-0 mt-0.5 ${
+                      isDarkMode ? "bg-red-950/60" : "bg-red-100"
+                    }`}
+                  >
                     <span className="material-symbols-outlined text-base font-bold">
                       check
                     </span>

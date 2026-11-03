@@ -31,14 +31,11 @@ export default function MissionVisionBento() {
                 Real Results
               </span>
             </div>
-            <h2
-              className={`text-3xl lg:text-4xl font-black tracking-tight ${headingText}`}
-            >
+            <h2 className={`text-3xl lg:text-4xl font-black tracking-tight ${headingText}`}>
               Our Mission &amp; Vision
             </h2>
             <p className={`text-sm lg:text-base mt-2 max-w-xl ${subText}`}>
-              Empowering every citizen with an easy, compassionate avenue to
-              donate or receive life-saving blood when time is critical.
+              Empowering every citizen with an easy, compassionate avenue to donate or receive life-saving blood when time is critical.
             </p>
           </div>
 
@@ -77,21 +74,21 @@ export default function MissionVisionBento() {
                     volunteer_activism
                   </span>
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#dc2626] bg-red-100 dark:bg-red-950/60 px-3 py-1 rounded-full border border-red-200 dark:border-red-900/60">
+                <span
+                  className={`text-xs font-bold uppercase tracking-wider text-[#dc2626] px-3 py-1 rounded-full border ${
+                    isDarkMode
+                      ? "bg-red-950/60 border-red-900/60"
+                      : "bg-red-100 border-red-200"
+                  }`}
+                >
                   Core Pillar
                 </span>
               </div>
-              <h3
-                className={`text-2xl lg:text-3xl font-bold mb-4 ${headingText}`}
-              >
+              <h3 className={`text-2xl lg:text-3xl font-bold mb-4 ${headingText}`}>
                 Our Mission
               </h3>
-              <p
-                className={`text-base lg:text-lg leading-relaxed max-w-xl ${subText}`}
-              >
-                To make blood donation more accessible by connecting donors and
-                people in need through a simple, reliable and user-friendly
-                digital platform.
+              <p className={`text-base lg:text-lg leading-relaxed max-w-xl ${subText}`}>
+                To make blood donation more accessible by connecting donors and people in need through a simple, reliable and user-friendly digital platform.
               </p>
             </div>
             <div
@@ -114,7 +111,11 @@ export default function MissionVisionBento() {
           >
             <div>
               <div className="flex items-center justify-between mb-5">
-                <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/60 flex items-center justify-center text-[#dc2626]">
+                <div
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center text-[#dc2626] ${
+                    isDarkMode ? "bg-red-950/60" : "bg-red-100"
+                  }`}
+                >
                   <span className="material-symbols-outlined text-2xl">
                     group
                   </span>
@@ -152,7 +153,11 @@ export default function MissionVisionBento() {
             className={`lg:col-span-4 border rounded-3xl p-8 hover:-translate-y-1 transition-all duration-300 shadow-sm flex flex-col justify-between ${cardBg}`}
           >
             <div>
-              <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/60 flex items-center justify-center text-[#dc2626] mb-5">
+              <div
+                className={`w-12 h-12 rounded-2xl flex items-center justify-center text-[#dc2626] mb-5 ${
+                  isDarkMode ? "bg-red-950/60" : "bg-red-100"
+                }`}
+              >
                 <span className="material-symbols-outlined text-2xl">
                   bloodtype
                 </span>
@@ -186,24 +191,30 @@ export default function MissionVisionBento() {
             <div className="absolute -left-16 -bottom-16 w-56 h-56 bg-red-500/10 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-500" />
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-red-100 dark:bg-red-950/60 text-[#dc2626] flex items-center justify-center shadow-sm">
+                <div
+                  className={`w-14 h-14 rounded-2xl text-[#dc2626] flex items-center justify-center shadow-sm ${
+                    isDarkMode ? "bg-red-950/60" : "bg-red-100"
+                  }`}
+                >
                   <span className="material-symbols-outlined text-3xl">
                     crisis_alert
                   </span>
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#dc2626] bg-red-100 dark:bg-red-950/60 px-3 py-1 rounded-full border border-red-200 dark:border-red-900/60">
+                <span
+                  className={`text-xs font-bold uppercase tracking-wider text-[#dc2626] px-3 py-1 rounded-full border ${
+                    isDarkMode
+                      ? "bg-red-950/60 border-red-900/60"
+                      : "bg-red-100 border-red-200"
+                  }`}
+                >
                   Long-term Vision
                 </span>
               </div>
-              <h3
-                className={`text-2xl lg:text-3xl font-bold mb-4 ${headingText}`}
-              >
+              <h3 className={`text-2xl lg:text-3xl font-bold mb-4 ${headingText}`}>
                 Our Vision
               </h3>
               <p className={`text-base lg:text-lg leading-relaxed ${subText}`}>
-                To contribute to a connected and compassionate community where
-                finding blood donors becomes easier and every opportunity to
-                help save a life matters.
+                To contribute to a connected and compassionate community where finding blood donors becomes easier and every opportunity to help save a life matters.
               </p>
             </div>
             <div
@@ -226,12 +237,22 @@ export default function MissionVisionBento() {
           >
             <div>
               <div className="flex items-center justify-between mb-5">
-                <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/60 flex items-center justify-center text-[#dc2626]">
+                <div
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center text-[#dc2626] ${
+                    isDarkMode ? "bg-red-950/60" : "bg-red-100"
+                  }`}
+                >
                   <span className="material-symbols-outlined text-2xl">
                     ecg_heart
                   </span>
                 </div>
-                <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                <span
+                  className={`text-[11px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1.5 ${
+                    isDarkMode
+                      ? "text-emerald-300 bg-emerald-950/60"
+                      : "text-emerald-700 bg-emerald-100"
+                  }`}
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   Ready Now
                 </span>
@@ -260,12 +281,20 @@ export default function MissionVisionBento() {
           >
             <div>
               <div className="flex items-center justify-between mb-5">
-                <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/60 flex items-center justify-center text-[#dc2626]">
+                <div
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center text-[#dc2626] ${
+                    isDarkMode ? "bg-red-950/60" : "bg-red-100"
+                  }`}
+                >
                   <span className="material-symbols-outlined text-2xl">
                     cardiology
                   </span>
                 </div>
-                <span className="text-[11px] font-bold uppercase tracking-widest text-[#dc2626] bg-red-100 dark:bg-red-950/60 px-2.5 py-1 rounded-full">
+                <span
+                  className={`text-[11px] font-bold uppercase tracking-widest text-[#dc2626] px-2.5 py-1 rounded-full ${
+                    isDarkMode ? "bg-red-950/60" : "bg-red-100"
+                  }`}
+                >
                   Lives Saved
                 </span>
               </div>

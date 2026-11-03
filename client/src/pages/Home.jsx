@@ -8,9 +8,9 @@ import HowItWorks from "../components/HowItWorks";
 import UrgentRequests from "../components/UrgentRequests";
 import WhyLifeLink from "../components/WhyLifeLink";
 import Testimonials from "../components/Testimonials";
-import CallToAction from "../components/CallToAction";
 import Footer from "../components/Footer";
 import { useApp } from "../context/AppContext";
+import AboutCta from "../components/about/AboutCta";
 
 export default function Home() {
   const { isDarkMode } = useApp();
@@ -34,7 +34,7 @@ export default function Home() {
         <UrgentRequests />
         <WhyLifeLink />
         <Testimonials />
-        <CallToAction />
+        <AboutCta />
       </main>
       <Footer />
     </div>

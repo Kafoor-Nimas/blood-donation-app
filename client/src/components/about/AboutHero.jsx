@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
+import img from "../../assets/aboutHero2.jfif";
 
 export default function AboutHero() {
   const { isDarkMode } = useApp();
@@ -10,7 +11,7 @@ export default function AboutHero() {
         {/* Full panoramic photography backdrop */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHpOJGJGxxr5YdyD-14XNPge2zzK9FAKzzf13Hmo6NsmfGhT4KZMtL03gGn31awLo6lMPzmLabWHEw7-3SCOcf6BaLXTfsGPqu2T5bDJmHRHm4xeV0qOWGwwDghoChMJUXI6BUOSfVIrsbyYaL2-fVIjLMQbLfdYc-_K2LiCZ5WzoHgEpnRdZ0KcJS76F7QGQmpe2tQ-ILmEAmrLhxjSTDBg6kzh3HT4M0GJEXItMlYXMKaX-Q68UloA"
+            src={img}
             alt="Blood donation coordination at LifeLink"
             className="w-full h-full object-cover object-center filter saturate-[1.1]"
           />
@@ -75,7 +76,10 @@ export default function AboutHero() {
                   isDarkMode ? "text-slate-300" : "text-[#5c403c]"
                 }`}
               >
-                LifeLink is a blood donation management platform designed to connect people who need blood with generous donors willing to make a difference. We believe that technology and compassion together can help build a stronger blood donation community.
+                LifeLink is a blood donation management platform designed to
+                connect people who need blood with generous donors willing to
+                make a difference. We believe that technology and compassion
+                together can help build a stronger blood donation community.
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -135,7 +139,11 @@ export default function AboutHero() {
               : "bg-white/95 border-white/80 text-[#1a0e0e]"
           }`}
         >
-          <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-950/60 flex items-center justify-center text-[#dc2626] shrink-0">
+          <div
+            className={`w-12 h-12 rounded-xl flex items-center justify-center text-[#dc2626] shrink-0 ${
+              isDarkMode ? "bg-red-950/60" : "bg-red-100"
+            }`}
+          >
             <span className="material-symbols-outlined text-2xl">
               diversity_1
             </span>

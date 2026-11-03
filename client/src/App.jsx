@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ScrollToTop from "./components/ScrollToTop";
 import AdminDashboard from "./pages/AdminDashboard";
+import About from "./pages/About";
 // import Products from "./pages/Products";
 
 export default function App() {
@@ -25,9 +26,9 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin" element={<AdminDashboard />} />
-
+            <Route path="/about-us" element={<About />} />
             {/* <Route path="/products" element={<Products />} />
-            <Route path="/about-us" element={<Home />} /> */}
+             */}
           </Routes>
         </div>
       </Router>

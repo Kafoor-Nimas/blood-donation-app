@@ -58,8 +58,7 @@ export default function HowItWorksPipeline() {
               isDarkMode ? "text-slate-400" : "text-[#5c403c]"
             }`}
           >
-            A straightforward process that helps connect donors with people who
-            need blood quickly and respectfully.
+            A straightforward process that helps connect donors with people who need blood quickly and respectfully.
           </p>
         </div>
 
@@ -76,7 +75,11 @@ export default function HowItWorksPipeline() {
             >
               <div>
                 <div className="flex items-center justify-between mb-8">
-                  <div className="w-16 h-16 rounded-2xl bg-red-100 dark:bg-red-950/60 text-[#dc2626] flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                  <div
+                    className={`w-16 h-16 rounded-2xl text-[#dc2626] flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform ${
+                      isDarkMode ? "bg-red-950/60" : "bg-red-100"
+                    }`}
+                  >
                     <span className="material-symbols-outlined text-3xl">
                       {step.icon}
                     </span>

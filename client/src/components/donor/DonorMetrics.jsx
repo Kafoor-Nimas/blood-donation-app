@@ -4,13 +4,11 @@ export default function DonorMetrics() {
   const { isDarkMode } = useApp();
 
   const cardStyle = `rounded-xl p-4 shadow-sm border flex flex-col justify-between transition-colors ${
-    isDarkMode
-      ? "bg-[#1E293B] border-[#334155]"
-      : "bg-white border-slate-100"
+    isDarkMode ? "bg-[#1E293B] border-[#334155]" : "bg-white border-slate-100"
   }`;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-7xl mx-auto px-6 lg:px-12">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-[1600px]l mx-auto px-6 lg:px-12">
       {/* Card 1: Total Donors */}
       <div className={cardStyle}>
         <div className="flex items-center justify-between">

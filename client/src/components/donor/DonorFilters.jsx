@@ -20,7 +20,7 @@ export default function DonorFilters({
   }`;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full">
+    <div className="max-w-[1600px]l mx-auto px-6 lg:px-12 w-full">
       <div
         className={`rounded-xl p-4 shadow-sm border transition-colors ${
           isDarkMode

@@ -13,15 +13,13 @@ export default function DonorHeader() {
           isDarkMode ? "bg-[#1E293B] text-white" : "bg-slate-100 text-[#0b1c30]"
         }`}
       >
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4">
+        <div className="max-w-[1600px]l mx-auto w-full flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 overflow-hidden">
             <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#dc2626] animate-ping" />
             <span className="text-xs font-semibold uppercase tracking-wider text-[#dc2626]">
               Live Operational Command
             </span>
-            <span
-              className={isDarkMode ? "text-slate-600" : "text-slate-300"}
-            >
+            <span className={isDarkMode ? "text-slate-600" : "text-slate-300"}>
               |
             </span>
             <p
@@ -51,7 +49,7 @@ export default function DonorHeader() {
       </div>
 
       {/* Main Container Padding */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 pt-2 space-y-6">
+      <div className="max-w-[1600px]l mx-auto px-6 lg:px-12 pt-2 space-y-6">
         {/* Toast Notification Banner */}
         {showToast && (
           <div

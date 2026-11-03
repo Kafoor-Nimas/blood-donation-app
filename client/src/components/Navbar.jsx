@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 
 export default function Navbar() {
-  const { isDarkMode, setIsDarkMode } = useApp();
+  const { isDarkMode, setIsDarkMode, user, isAuthenticated, logout } = useApp();
 
   return (
     <header
@@ -50,7 +50,7 @@ export default function Navbar() {
 
         {/* Right Action Bar */}
         <div className="flex items-center gap-3">
-          {/* Search Input Tag */}
+          {/* Search Input */}
           <div className="relative flex items-center">
             <span
               className="material-symbols-outlined absolute left-3 pointer-events-none text-[18px]"
@@ -83,7 +83,7 @@ export default function Navbar() {
             type="button"
             aria-label="Toggle dark mode"
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className={`p-2 rounded-xl transition-colors ${
+            className={`p-2 rounded-xl transition-colors cursor-pointer ${
               isDarkMode
                 ? "text-amber-400 hover:bg-[#1E293B]"
                 : "text-slate-600 hover:bg-slate-100"
@@ -94,30 +94,69 @@ export default function Navbar() {
             </span>
           </button>
 
-          {/* Profile Badge */}
-          
-          <Link
-            to="/login"
-            className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-[#334155] hover:opacity-80 transition-opacity cursor-pointer"
+          {/* Auth State Conditional Rendering */}
+          <div
+            className={`pl-2 border-l ${
+              isDarkMode ? "border-[#334155]" : "border-slate-200"
+            }`}
           >
-            <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2G3ltv8cQ0E23GIppn5aiMa68EYbw57Pw7NkBgHnBSezo_ivW0UrmgeHupmUISKVRWvOUot1oYvVyf_pLNs9xj8iolBHWPks9S-9CDvQYJM9LVO0LCF5BayrrXNFoT48c4nyajlq8wCIOfPwf3ArV2AooSQrERdporSrdN5SPNgr7Q-gH5BwKrBi9hmnrS56K3c2Tcs3J5Rr7bWQZ4Qju0OqGVW27sT8OMp21RcaN"
-              alt="Profile"
-              className="w-8 h-8 rounded-full object-cover ring-2 ring-[#b70011]/30"
-            />
-            <div className="hidden sm:flex flex-col text-left">
-              <span
-                className={`text-xs font-semibold ${
-                  isDarkMode ? "text-[#F8FAFC]" : "text-[#0b1c30]"
-                }`}
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+                >
+                  <img
+                    src={
+                      user?.avatar ||
+                      "https://lh3.googleusercontent.com/aida-public/AB6AXuD2G3ltv8cQ0E23GIppn5aiMa68EYbw57Pw7NkBgHnBSezo_ivW0UrmgeHupmUISKVRWvOUot1oYvVyf_pLNs9xj8iolBHWPks9S-9CDvQYJM9LVO0LCF5BayrrXNFoT48c4nyajlq8wCIOfPwf3ArV2AooSQrERdporSrdN5SPNgr7Q-gH5BwKrBi9hmnrS56K3c2Tcs3J5Rr7bWQZ4Qju0OqGVW27sT8OMp21RcaN"
+                    }
+                    alt={user?.name || "Profile"}
+                    className="w-8 h-8 rounded-full object-cover ring-2 ring-[#b70011]/30"
+                  />
+                  <div className="hidden sm:flex flex-col text-left">
+                    <span
+                      className={`text-xs font-semibold ${
+                        isDarkMode ? "text-[#F8FAFC]" : "text-[#0b1c30]"
+                      }`}
+                    >
+                      {user?.name || "Dr. Sarah Vance"}
+                    </span>
+                    <span className="text-[10px] text-[#b70011] uppercase font-bold tracking-wider">
+                      {user?.role || "Requester"}
+                    </span>
+                  </div>
+                </Link>
+
+                {/* Optional Logout Action */}
+                {logout && (
+                  <button
+                    onClick={logout}
+                    title="Sign Out"
+                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                      isDarkMode
+                        ? "text-slate-400 hover:text-red-400 hover:bg-[#1E293B]"
+                        : "text-slate-500 hover:text-red-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined !text-[18px]">
+                      logout
+                    </span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center gap-1.5 px-4 py-2 bg-[#dc2626] hover:bg-[#b70011] text-white text-xs font-bold rounded-xl transition-all shadow-sm hover:shadow active:scale-95 cursor-pointer"
               >
-                Dr. Sarah Vance
-              </span>
-              <span className="text-[10px] text-[#b70011] uppercase font-bold tracking-wider">
-                Requester
-              </span>
-            </div>
-          </Link>
+                <span className="material-symbols-outlined !text-[16px]">
+                  login
+                </span>
+                <span>Login</span>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </header>

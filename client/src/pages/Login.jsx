@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import API from "../services/api";
 import { useApp } from "../context/AppContext";
 
 export default function Login() {
-  const { isDarkMode } = useApp();
+  const { isDarkMode, setUser } = useApp();
   const navigate = useNavigate();
 
   // Form State
@@ -13,21 +14,47 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+
+  // API State
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
     setIsSubmitting(true);
 
-    // Simulated Authentication Delay
-    setTimeout(() => {
+    try {
+      // Live API Call to Backend
+      const response = await API.post("/auth/login", { email, password });
+      const { token, user } = response.data;
+
+      // Save JWT Token & Update Global Context User
+      localStorage.setItem("lifelink_token", token);
+      if (setUser) {
+        setUser(user);
+      }
+
       setIsSubmitting(false);
       setIsAuthorized(true);
+
+      // Brief visual confirmation before routing based on role
       setTimeout(() => {
-        navigate("/blood-requests");
+        if (user?.role === "Admin") {
+          navigate("/admin");
+        } else {
+          navigate("/blood-requests");
+        }
       }, 600);
-    }, 900);
+    } catch (error) {
+      setIsSubmitting(false);
+      setIsAuthorized(false);
+      setErrorMessage(
+        error.response?.data?.message ||
+          "Invalid email or password. Please try again.",
+      );
+    }
   };
 
   return (
@@ -180,6 +207,16 @@ export default function Login() {
                     donation availability.
                   </p>
                 </div>
+
+                {/* Error Banner */}
+                {errorMessage && (
+                  <div className="mb-5 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-[#dc2626] text-xs font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-base">
+                      error
+                    </span>
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
 
                 {/* Authentication Form */}
                 <form className="space-y-5" onSubmit={handleSubmit}>
@@ -349,8 +386,7 @@ export default function Login() {
                       lock_reset
                     </span>
                     <span className="text-[11px]">
-                      Secured with AES-256 encryption &amp; bcrypt session
-                      hashing
+                      Secured with AES-256 encryption &amp; JWT session hashing
                     </span>
                   </div>
 

@@ -83,24 +83,46 @@ export default function BloodRequests() {
   //     });
   //   }, [statusTab, bloodFilter, districtFilter, urgencyFilter]);
 
+  // const filteredRequests = useMemo(() => {
+  //   return requests.filter((item) => {
+  //     if (statusTab !== "all" && item.status !== statusTab) return false;
+  //     if (bloodFilter && item.bloodGroup !== bloodFilter) return false;
+  //     if (districtFilter && item.district !== districtFilter) return false;
+
+  //     if (urgencyFilter === "urgent" && item.status !== "urgent") return false;
+  //     if (
+  //       urgencyFilter === "critical" &&
+  //       item.status !== "urgent" &&
+  //       item.status !== "open"
+  //     )
+  //       return false;
+  //     if (urgencyFilter === "standard" && item.status !== "open") return false;
+
+  //     return true;
+  //   });
+  // }, [requests, statusTab, bloodFilter, districtFilter, urgencyFilter]);
+
   const filteredRequests = useMemo(() => {
-    return requests.filter((item) => {
-      if (statusTab !== "all" && item.status !== statusTab) return false;
-      if (bloodFilter && item.bloodGroup !== bloodFilter) return false;
-      if (districtFilter && item.district !== districtFilter) return false;
+  // Ensure requests is guaranteed to be an array before calling .filter()
+  const list = Array.isArray(requests) ? requests : [];
 
-      if (urgencyFilter === "urgent" && item.status !== "urgent") return false;
-      if (
-        urgencyFilter === "critical" &&
-        item.status !== "urgent" &&
-        item.status !== "open"
-      )
-        return false;
-      if (urgencyFilter === "standard" && item.status !== "open") return false;
+  return list.filter((item) => {
+    if (statusTab !== "all" && item.status !== statusTab) return false;
+    if (bloodFilter && item.bloodGroup !== bloodFilter) return false;
+    if (districtFilter && item.district !== districtFilter) return false;
 
-      return true;
-    });
-  }, [requests, statusTab, bloodFilter, districtFilter, urgencyFilter]);
+    if (urgencyFilter === "urgent" && item.status !== "urgent") return false;
+    if (
+      urgencyFilter === "critical" &&
+      item.status !== "urgent" &&
+      item.status !== "open"
+    )
+      return false;
+    if (urgencyFilter === "standard" && item.status !== "open") return false;
+
+    return true;
+  });
+}, [requests, statusTab, bloodFilter, districtFilter, urgencyFilter]);
 
   const resetAllFilters = () => {
     setStatusTab("all");

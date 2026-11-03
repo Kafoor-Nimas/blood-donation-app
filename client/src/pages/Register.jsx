@@ -1,11 +1,12 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import API from "../services/api";
 import { useApp } from "../context/AppContext";
 
 export default function Register() {
-  const { isDarkMode } = useApp();
+  const { isDarkMode, setUser } = useApp();
   const navigate = useNavigate();
 
   // Form State
@@ -14,12 +15,15 @@ export default function Register() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [bloodGroup, setBloodGroup] = useState("A+");
+  const [district, setDistrict] = useState("Colombo");
   const [agreeTerms, setAgreeTerms] = useState(true);
 
-  // UI Control State
+  // UI & API Control State
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Real-time Password Strength Criteria
   const passwordCriteria = useMemo(() => {
@@ -46,22 +50,46 @@ export default function Register() {
     return { text: "Enter Password", color: "text-slate-400" };
   }, [strengthScore]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match. Please verify your entries.");
+      setErrorMessage("Passwords do not match. Please verify your entries.");
       return;
     }
 
     setIsSubmitting(true);
 
-    // Simulated API Registration Delay
-    setTimeout(() => {
+    try {
+      // Live API Call to Backend
+      const response = await API.post("/auth/register", {
+        name: fullName,
+        email,
+        phone,
+        password,
+        bloodGroup,
+        district,
+        role: "Requester",
+      });
+
+      const { token, user } = response.data;
+
+      // Save JWT Token & Update Global User State
+      localStorage.setItem("lifelink_token", token);
+      if (setUser) {
+        setUser(user);
+      }
+
       setIsSubmitting(false);
-      alert("Registration successful! Redirecting to login portal.");
-      navigate("/login");
-    }, 1000);
+      navigate("/find-donors");
+    } catch (error) {
+      setIsSubmitting(false);
+      setErrorMessage(
+        error.response?.data?.message ||
+          "Registration failed. Please check your information and try again.",
+      );
+    }
   };
 
   return (
@@ -239,6 +267,16 @@ export default function Register() {
                   </p>
                 </div>
 
+                {/* Error Banner */}
+                {errorMessage && (
+                  <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-[#dc2626] text-xs font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-base">
+                      error
+                    </span>
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
                 {/* Registration Form */}
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   {/* Full Name */}
@@ -356,17 +394,63 @@ export default function Register() {
                         }`}
                       />
                     </div>
-                    <p
-                      className={`text-[10px] flex items-center gap-1 mt-0.5 ${
-                        isDarkMode ? "text-slate-400" : "text-slate-500"
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-[14px]">
-                        info
-                      </span>
-                      Used for emergency dispatch alerts and OTP validation
-                      only.
-                    </p>
+                  </div>
+
+                  {/* Blood Group & District Selectors */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label
+                        className={`text-xs font-semibold ${
+                          isDarkMode ? "text-[#F8FAFC]" : "text-[#0b1c30]"
+                        }`}
+                      >
+                        Blood Group
+                      </label>
+                      <select
+                        value={bloodGroup}
+                        onChange={(e) => setBloodGroup(e.target.value)}
+                        className={`w-full px-3 py-2.5 rounded-xl text-xs font-semibold outline-none transition-all ${
+                          isDarkMode
+                            ? "bg-[#111827] text-[#F8FAFC] border border-[#334155]"
+                            : "bg-slate-100 text-[#0b1c30] border border-slate-200"
+                        }`}
+                      >
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label
+                        className={`text-xs font-semibold ${
+                          isDarkMode ? "text-[#F8FAFC]" : "text-[#0b1c30]"
+                        }`}
+                      >
+                        District
+                      </label>
+                      <select
+                        value={district}
+                        onChange={(e) => setDistrict(e.target.value)}
+                        className={`w-full px-3 py-2.5 rounded-xl text-xs font-semibold outline-none transition-all ${
+                          isDarkMode
+                            ? "bg-[#111827] text-[#F8FAFC] border border-[#334155]"
+                            : "bg-slate-100 text-[#0b1c30] border border-slate-200"
+                        }`}
+                      >
+                        <option value="Colombo">Colombo</option>
+                        <option value="Gampaha">Gampaha</option>
+                        <option value="Kandy">Kandy</option>
+                        <option value="Galle">Galle</option>
+                        <option value="Kurunegala">Kurunegala</option>
+                        <option value="Jaffna">Jaffna</option>
+                      </select>
+                    </div>
                   </div>
 
                   {/* Password Field */}

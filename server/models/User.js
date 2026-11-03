@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
       enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
       required: true,
     },
-    city: { type: String, required: true },
+    district: { type: String, required: true },
     phone: { type: String, required: true },
     isAvailable: { type: Boolean, default: true },
     isVerified: { type: Boolean, default: false },

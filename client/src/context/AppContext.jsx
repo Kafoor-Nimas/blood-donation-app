@@ -15,9 +15,9 @@ export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
-  // --- Requests & General State (Guaranteed Array Default) ---
+  // --- Requests State ---
   const [requests, setRequests] = useState([]);
-  const [requestsLoading, setRequestsLoading] = useState(true);
+  const [loadingRequests, setLoadingRequests] = useState(true);
 
   // 1. Verify existing auth token on initial app load
   useEffect(() => {
@@ -39,36 +39,25 @@ export const AppProvider = ({ children }) => {
     checkAuthStatus();
   }, []);
 
-  // 2. Fetch Blood Requests with Safe Array Validation & Mock Fallback
+  // 2. Fetch Blood Requests with Safe Array Validation & Fallback
+  const fetchRequests = async () => {
+    setLoadingRequests(true);
+    try {
+      const response = await API.get("/requests");
+      const data = response.data?.requests || response.data || [];
+      setRequests(data);
+    } catch (error) {
+      console.error(
+        "Failed to fetch blood requests. Using fallback data:",
+        error,
+      );
+      setRequests(INITIAL_REQUESTS_DATA || []);
+    } finally {
+      setLoadingRequests(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchRequests = async () => {
-      setRequestsLoading(true);
-      try {
-        const response = await API.get("/requests");
-
-        // Extract array payload regardless of backend wrapping structure
-        let dataArray = [];
-        if (Array.isArray(response.data)) {
-          dataArray = response.data;
-        } else if (Array.isArray(response.data?.requests)) {
-          dataArray = response.data.requests;
-        } else if (Array.isArray(response.data?.data)) {
-          dataArray = response.data.data;
-        } else {
-          // Default fallback if response format is unexpected
-          dataArray = INITIAL_REQUESTS_DATA || [];
-        }
-
-        setRequests(dataArray);
-      } catch (error) {
-        console.error("Failed to fetch blood requests. Using fallback data:", error);
-        // Ensure state remains an array on API failure
-        setRequests(INITIAL_REQUESTS_DATA || []);
-      } finally {
-        setRequestsLoading(false);
-      }
-    };
-
     fetchRequests();
   }, []);
 
@@ -92,7 +81,7 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await API.post("/requests", newReqData);
       const createdItem = response.data.request || response.data;
-      
+
       setRequests((prev) => {
         const currentList = Array.isArray(prev) ? prev : [];
         return [createdItem, ...currentList];
@@ -135,7 +124,8 @@ export const AppProvider = ({ children }) => {
         // Request Exports
         requests,
         setRequests,
-        requestsLoading,
+        fetchRequests,
+        loadingRequests,
         addBloodRequest,
       }}
     >

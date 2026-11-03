@@ -58,17 +58,16 @@ export const createBloodRequest = async (req, res) => {
 
 export const getBloodRequests = async (req, res) => {
   try {
-    const requests = await BloodRequest.find().populate(
-      "requester",
-      "name email",
-    );
+    const requests = await BloodRequest.find()
+      .populate("requester", "name email phone")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
       requests,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Get Blood Requests Error:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",

@@ -18,7 +18,15 @@ const bloodRequestSchema = new mongoose.Schema(
     city: { type: String, required: true },
     urgency: {
       type: String,
-      enum: ["low", "medium", "high", "critical"],
+      enum: [
+        "low",
+        "medium",
+        "high",
+        "critical",
+        "urgent",
+        "standard",
+        "normal",
+      ],
       default: "critical",
     },
     contactPhone: { type: String, default: "N/A" },
@@ -28,7 +36,7 @@ const bloodRequestSchema = new mongoose.Schema(
       default: "Pending",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("BloodRequest", bloodRequestSchema);

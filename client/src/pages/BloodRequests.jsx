@@ -4,11 +4,10 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import RequestCard from "../components/RequestCard";
 import FulfillModal from "../components/FulfillModal";
-import { INITIAL_REQUESTS_DATA } from "../data/data";
 import { useApp } from "../context/AppContext";
 
 export default function BloodRequests() {
-  const { isDarkMode, requests } = useApp();
+  const { isDarkMode, requests, fetchRequests, loadingRequests } = useApp();
 
   // Filter States
   const [statusTab, setStatusTab] = useState("all");
@@ -19,7 +18,7 @@ export default function BloodRequests() {
   // Modal & Toast States
   const [activeModalRequest, setActiveModalRequest] = useState(null);
   const [toastMessage, setToastMessage] = useState(
-    "Someone responded to Blood Request #BL-904 in Kandy 2 mins ago.",
+    "Someone responded to Blood Request in Kandy 2 mins ago."
   );
   const [showToast, setShowToast] = useState(true);
 
@@ -33,6 +32,13 @@ export default function BloodRequests() {
   ];
   const [tickerIndex, setTickerIndex] = useState(0);
   const [tickerFade, setTickerFade] = useState(true);
+
+  // Fetch latest requests when component mounts
+  useEffect(() => {
+    if (fetchRequests) {
+      fetchRequests();
+    }
+  }, []);
 
   // Live Activity Ticker Loop
   useEffect(() => {
@@ -49,9 +55,9 @@ export default function BloodRequests() {
   // Live Toast Loop
   useEffect(() => {
     const toastMessages = [
-      "Someone responded to Blood Request #BL-904 in Kandy 2 mins ago.",
+      "Someone responded to Blood Request in Kandy 2 mins ago.",
       "Clinical verification cleared for O- emergency reserve in Galle.",
-      "New matching donor verified for #REF-LRH-8821 in Colombo.",
+      "New matching donor verified in Colombo.",
     ];
     let toastIdx = 0;
     const interval = setInterval(() => {
@@ -63,66 +69,56 @@ export default function BloodRequests() {
     return () => clearInterval(interval);
   }, [showToast]);
 
-  // Multi-Filter Logic
-  //   const filteredRequests = useMemo(() => {
-  //     return INITIAL_REQUESTS_DATA.filter((item) => {
-  //       if (statusTab !== "all" && item.status !== statusTab) return false;
-  //       if (bloodFilter && item.bloodGroup !== bloodFilter) return false;
-  //       if (districtFilter && item.district !== districtFilter) return false;
-
-  //       if (urgencyFilter === "urgent" && item.status !== "urgent") return false;
-  //       if (
-  //         urgencyFilter === "critical" &&
-  //         item.status !== "urgent" &&
-  //         item.status !== "open"
-  //       )
-  //         return false;
-  //       if (urgencyFilter === "standard" && item.status !== "open") return false;
-
-  //       return true;
-  //     });
-  //   }, [statusTab, bloodFilter, districtFilter, urgencyFilter]);
-
-  // const filteredRequests = useMemo(() => {
-  //   return requests.filter((item) => {
-  //     if (statusTab !== "all" && item.status !== statusTab) return false;
-  //     if (bloodFilter && item.bloodGroup !== bloodFilter) return false;
-  //     if (districtFilter && item.district !== districtFilter) return false;
-
-  //     if (urgencyFilter === "urgent" && item.status !== "urgent") return false;
-  //     if (
-  //       urgencyFilter === "critical" &&
-  //       item.status !== "urgent" &&
-  //       item.status !== "open"
-  //     )
-  //       return false;
-  //     if (urgencyFilter === "standard" && item.status !== "open") return false;
-
-  //     return true;
-  //   });
-  // }, [requests, statusTab, bloodFilter, districtFilter, urgencyFilter]);
-
+  // Normalized Multi-Filter Logic
   const filteredRequests = useMemo(() => {
-  // Ensure requests is guaranteed to be an array before calling .filter()
-  const list = Array.isArray(requests) ? requests : [];
+    const list = Array.isArray(requests) ? requests : [];
 
-  return list.filter((item) => {
-    if (statusTab !== "all" && item.status !== statusTab) return false;
-    if (bloodFilter && item.bloodGroup !== bloodFilter) return false;
-    if (districtFilter && item.district !== districtFilter) return false;
+    return list.filter((item) => {
+      const itemStatus = (item.status || "Pending").toLowerCase();
+      const itemUrgency = (item.urgency || "standard").toLowerCase();
 
-    if (urgencyFilter === "urgent" && item.status !== "urgent") return false;
-    if (
-      urgencyFilter === "critical" &&
-      item.status !== "urgent" &&
-      item.status !== "open"
-    )
-      return false;
-    if (urgencyFilter === "standard" && item.status !== "open") return false;
+      // 1. Status Tab Filter
+      if (statusTab === "urgent") {
+        if (itemUrgency !== "urgent" && itemUrgency !== "critical") return false;
+      } else if (statusTab === "open" || statusTab === "pending") {
+        if (itemStatus !== "pending" && itemStatus !== "open") return false;
+      } else if (statusTab === "fulfilled") {
+        if (itemStatus !== "fulfilled") return false;
+      }
 
-    return true;
-  });
-}, [requests, statusTab, bloodFilter, districtFilter, urgencyFilter]);
+      // 2. Blood Group Filter
+      if (bloodFilter && item.bloodGroup !== bloodFilter) return false;
+
+      // 3. District / Location Filter
+      const itemLocation = `${item.district || ""} ${item.city || ""}`.toLowerCase();
+      if (districtFilter && !itemLocation.includes(districtFilter.toLowerCase())) {
+        return false;
+      }
+
+      // 4. Urgency Filter Dropdown
+      if (urgencyFilter) {
+        if (urgencyFilter === "urgent" && itemUrgency !== "urgent" && itemUrgency !== "critical") return false;
+        if (urgencyFilter === "critical" && itemUrgency !== "critical") return false;
+        if (urgencyFilter === "standard" && itemUrgency !== "standard" && itemUrgency !== "low") return false;
+      }
+
+      return true;
+    });
+  }, [requests, statusTab, bloodFilter, districtFilter, urgencyFilter]);
+
+  // Dynamic Tab Counts Calculation
+  const counts = useMemo(() => {
+    const list = Array.isArray(requests) ? requests : [];
+    return {
+      all: list.length,
+      urgent: list.filter((r) => {
+        const u = (r.urgency || "").toLowerCase();
+        return u === "urgent" || u === "critical";
+      }).length,
+      open: list.filter((r) => (r.status || "Pending").toLowerCase() === "pending").length,
+      fulfilled: list.filter((r) => (r.status || "").toLowerCase() === "fulfilled").length,
+    };
+  }, [requests]);
 
   const resetAllFilters = () => {
     setStatusTab("all");
@@ -135,7 +131,7 @@ export default function BloodRequests() {
     setActiveModalRequest(null);
     setShowToast(true);
     setToastMessage(
-      "Thank you! Hospital blood coordinator has been notified of your arrival.",
+      "Thank you! Hospital blood coordinator has been notified of your arrival."
     );
   };
 
@@ -150,7 +146,7 @@ export default function BloodRequests() {
       <Navbar />
 
       <main className="w-full pt-16">
-        {/* Header Header Banner */}
+        {/* Header Banner */}
         <div
           className={`w-full py-8 px-6 lg:px-12 transition-colors border-b ${
             isDarkMode
@@ -210,10 +206,10 @@ export default function BloodRequests() {
             {/* Status Tabs */}
             <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
               {[
-                { id: "all", label: "All Requests", count: 48 },
-                { id: "urgent", label: "Urgent", count: 12, dot: true },
-                { id: "open", label: "Open", count: 32 },
-                { id: "fulfilled", label: "Fulfilled", count: "140+" },
+                { id: "all", label: "All Requests", count: counts.all },
+                { id: "urgent", label: "Urgent", count: counts.urgent, dot: true },
+                { id: "open", label: "Open", count: counts.open },
+                { id: "fulfilled", label: "Fulfilled", count: counts.fulfilled },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -223,8 +219,8 @@ export default function BloodRequests() {
                     statusTab === tab.id
                       ? "bg-[#b70011] text-white shadow-sm"
                       : isDarkMode
-                        ? "text-[#CBD5E1] hover:bg-[#111827]"
-                        : "text-slate-600 hover:bg-slate-100"
+                      ? "text-[#CBD5E1] hover:bg-[#111827]"
+                      : "text-slate-600 hover:bg-slate-100"
                   }`}
                 >
                   {tab.dot && (
@@ -317,7 +313,7 @@ export default function BloodRequests() {
                 type="button"
                 onClick={resetAllFilters}
                 title="Reset Filters"
-                className={`p-2 rounded-xl transition-colors ${
+                className={`p-2 rounded-xl transition-colors cursor-pointer ${
                   isDarkMode
                     ? "text-[#94A3B8] hover:text-white hover:bg-[#334155]"
                     : "text-slate-500 hover:text-[#b70011] hover:bg-slate-100"
@@ -364,9 +360,20 @@ export default function BloodRequests() {
           </div>
         </div>
 
-        {/* Requests Grid */}
+        {/* Requests Grid / Skeleton */}
         <div className="max-w-[1600px] mx-auto w-full px-6 lg:px-12 my-6">
-          {filteredRequests.length === 0 ? (
+          {loadingRequests ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div
+                  key={i}
+                  className={`h-56 rounded-2xl animate-pulse border ${
+                    isDarkMode ? "bg-[#1E293B] border-[#334155]" : "bg-slate-200 border-slate-100"
+                  }`}
+                />
+              ))}
+            </div>
+          ) : filteredRequests.length === 0 ? (
             <div
               className={`rounded-2xl p-12 text-center shadow-sm max-w-xl mx-auto border ${
                 isDarkMode
@@ -391,7 +398,7 @@ export default function BloodRequests() {
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="px-6 py-2 bg-[#b70011] text-white font-semibold text-xs rounded-xl shadow hover:brightness-110"
+                className="px-6 py-2 bg-[#b70011] text-white font-semibold text-xs rounded-xl shadow hover:brightness-110 cursor-pointer"
               >
                 Clear Filters
               </button>
@@ -400,7 +407,7 @@ export default function BloodRequests() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredRequests.map((req) => (
                 <RequestCard
-                  key={req.id}
+                  key={req._id || req.id}
                   request={req}
                   onFulfill={(r) => setActiveModalRequest(r)}
                 />
@@ -420,7 +427,7 @@ export default function BloodRequests() {
           >
             <div className="text-xs">
               Showing <strong>1 - {filteredRequests.length}</strong> of{" "}
-              <strong>48</strong> verified requests
+              <strong>{requests.length}</strong> verified requests
             </div>
 
             <div className="flex items-center gap-1">
@@ -442,31 +449,6 @@ export default function BloodRequests() {
               </button>
               <button
                 type="button"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs transition-colors ${
-                  isDarkMode ? "hover:bg-[#334155]" : "hover:bg-slate-100"
-                }`}
-              >
-                2
-              </button>
-              <button
-                type="button"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs transition-colors ${
-                  isDarkMode ? "hover:bg-[#334155]" : "hover:bg-slate-100"
-                }`}
-              >
-                3
-              </button>
-              <span className="px-1 text-xs opacity-50">...</span>
-              <button
-                type="button"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs transition-colors ${
-                  isDarkMode ? "hover:bg-[#334155]" : "hover:bg-slate-100"
-                }`}
-              >
-                8
-              </button>
-              <button
-                type="button"
                 className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
                   isDarkMode ? "hover:bg-[#334155]" : "hover:bg-slate-100"
                 }`}
@@ -480,7 +462,7 @@ export default function BloodRequests() {
             <button
               type="button"
               onClick={resetAllFilters}
-              className="text-[#b70011] hover:underline text-xs font-semibold flex items-center gap-1"
+              className="text-[#b70011] hover:underline text-xs font-semibold flex items-center gap-1 cursor-pointer"
             >
               <span className="material-symbols-outlined !text-[16px]">
                 refresh
@@ -491,7 +473,7 @@ export default function BloodRequests() {
         </div>
       </main>
 
-      {/* Floating Toast Notification */}
+      {/* Toast Notification */}
       {showToast && (
         <div className="fixed bottom-6 right-6 z-50 transition-all duration-300">
           <div className="bg-[#213145] text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 max-w-sm">

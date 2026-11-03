@@ -19,6 +19,7 @@ export default function CreateRequest() {
   const [bloodGroup, setBloodGroup] = useState("");
   const [unitsCount, setUnitsCount] = useState(2);
   const [clinicalDepartment, setClinicalDepartment] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [hospitalName, setHospitalName] = useState("");
   const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
@@ -27,7 +28,6 @@ export default function CreateRequest() {
   const [requiredDate, setRequiredDate] = useState("");
   const [requiredTime, setRequiredTime] = useState("");
   const [clinicalNotes, setClinicalNotes] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
 
   // Loading & Error states
   const [submitting, setSubmitting] = useState(false);
@@ -46,11 +46,16 @@ export default function CreateRequest() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!contactPhone.trim()) {
+      setErrorMessage("Contact Phone Number is required.");
+      return;
+    }
+
     setSubmitting(true);
     setErrorMessage("");
 
     try {
-      // Map UI state keys to Backend Controller schema expectations
       const payload = {
         patientName: patientRef || "Anonymous Patient",
         bloodGroup,
@@ -58,24 +63,21 @@ export default function CreateRequest() {
         hospitalName,
         city: city || district,
         urgency: urgencyLevel,
-        contactPhone: contactPhone || "N/A",
+        contactPhone,
       };
 
-      // Axios automatically attaches authorization headers if configured in services/api.js
       await API.post("/requests", payload);
 
-      // Refresh list in context if function exists
       if (fetchRequests) {
         await fetchRequests();
       }
 
-      // Navigate to Blood Requests directory
       navigate("/blood-requests");
     } catch (error) {
       console.error("Failed to post blood request:", error);
       setErrorMessage(
         error.response?.data?.message ||
-          "Failed to submit request. Please try again.",
+          "Failed to submit request. Please try again."
       );
     } finally {
       setSubmitting(false);
@@ -113,6 +115,8 @@ export default function CreateRequest() {
               setUnitsCount={setUnitsCount}
               clinicalDepartment={clinicalDepartment}
               setClinicalDepartment={setClinicalDepartment}
+              contactPhone={contactPhone}
+              setContactPhone={setContactPhone}
             />
 
             <HospitalLocationSection

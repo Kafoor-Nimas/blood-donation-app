@@ -20,6 +20,8 @@ export default function PatientDetailsSection({
   setUnitsCount,
   clinicalDepartment,
   setClinicalDepartment,
+  contactPhone,
+  setContactPhone,
 }) {
   const { isDarkMode } = useApp();
 
@@ -42,7 +44,9 @@ export default function PatientDetailsSection({
           </span>
         </div>
         <div>
-          <h2 className="text-lg font-bold">1. Patient &amp; Transfusion Details</h2>
+          <h2 className="text-lg font-bold">
+            Patient &amp; Transfusion Details
+          </h2>
           <p
             className={`text-xs ${
               isDarkMode ? "text-[#94A3B8]" : "text-slate-500"
@@ -57,14 +61,14 @@ export default function PatientDetailsSection({
         {/* Patient Clinical Ref */}
         <div className="flex flex-col">
           <label className="text-xs font-semibold mb-1.5 flex items-center gap-1">
-            Patient Clinical Reference Code
+            Patient Clinical Reference Code / Name
             <span className="text-slate-400 font-normal">(Optional)</span>
           </label>
           <input
             type="text"
             value={patientRef}
             onChange={(e) => setPatientRef(e.target.value)}
-            placeholder="e.g. PAT-ICU-8821"
+            placeholder="e.g. PAT-ICU-8821 or Nimas"
             className={`w-full rounded-xl px-3 py-2 text-xs focus:outline-none border ${
               isDarkMode
                 ? "bg-[#111827] border-[#334155] text-[#F8FAFC] placeholder-slate-500"
@@ -80,6 +84,37 @@ export default function PatientDetailsSection({
           </span>
         </div>
 
+        {/* Contact Phone Field (REQUIRED FOR API) */}
+        <div className="flex flex-col">
+          <label className="text-xs font-semibold mb-1.5 flex items-center gap-1">
+            Contact Phone Number <span className="text-[#b70011]">*</span>
+          </label>
+          <div className="relative">
+            <input
+              type="tel"
+              required
+              value={contactPhone}
+              onChange={(e) => setContactPhone(e.target.value)}
+              placeholder="e.g. 0771234567"
+              className={`w-full rounded-xl px-3 py-2 pl-9 text-xs font-semibold focus:outline-none border ${
+                isDarkMode
+                  ? "bg-[#111827] border-[#334155] text-[#F8FAFC] placeholder-slate-500"
+                  : "bg-slate-50 border-slate-200 text-[#0b1c30] placeholder-slate-400"
+              }`}
+            />
+            <span className="material-symbols-outlined absolute left-2.5 top-2.5 pointer-events-none text-slate-400 !text-[18px]">
+              call
+            </span>
+          </div>
+          <span
+            className={`text-[10px] mt-1.5 ${
+              isDarkMode ? "text-[#94A3B8]" : "text-slate-500"
+            }`}
+          >
+            Direct contact line for potential donors and coordinators
+          </span>
+        </div>
+
         {/* Required Blood Group Selector */}
         <div className="flex flex-col">
           <div className="flex items-center justify-between mb-1.5">
@@ -91,11 +126,12 @@ export default function PatientDetailsSection({
                 bloodGroup
                   ? "bg-[#ffdad6] text-[#b70011]"
                   : isDarkMode
-                  ? "bg-[#111827] text-slate-400"
-                  : "bg-slate-100 text-slate-500"
+                    ? "bg-[#111827] text-slate-400"
+                    : "bg-slate-100 text-slate-500"
               }`}
             >
-              {COMPATIBILITY_MAP[bloodGroup] || "Select group to check compatibility"}
+              {COMPATIBILITY_MAP[bloodGroup] ||
+                "Select group to check compatibility"}
             </span>
           </div>
           <div className="relative">
@@ -109,7 +145,9 @@ export default function PatientDetailsSection({
                   : "bg-slate-50 border-slate-200 text-[#0b1c30]"
               }`}
             >
-              <option value="" disabled>Choose ABO/Rh group...</option>
+              <option value="" disabled>
+                Choose ABO/Rh group...
+              </option>
               <option value="O-">O Negative (Universal Red Cell Donor)</option>
               <option value="O+">O Positive (Most Frequently Required)</option>
               <option value="A-">A Negative</option>
@@ -154,7 +192,9 @@ export default function PatientDetailsSection({
                     : "bg-white text-slate-800 hover:bg-slate-200 shadow-sm"
                 }`}
               >
-                <span className="material-symbols-outlined !text-[18px]">remove</span>
+                <span className="material-symbols-outlined !text-[18px]">
+                  remove
+                </span>
               </button>
               <span className="w-12 text-center font-bold text-base text-[#b70011]">
                 {unitsCount}
@@ -168,7 +208,9 @@ export default function PatientDetailsSection({
                     : "bg-white text-slate-800 hover:bg-slate-200 shadow-sm"
                 }`}
               >
-                <span className="material-symbols-outlined !text-[18px]">add</span>
+                <span className="material-symbols-outlined !text-[18px]">
+                  add
+                </span>
               </button>
             </div>
 
@@ -182,8 +224,8 @@ export default function PatientDetailsSection({
                     unitsCount === u
                       ? "bg-[#b70011] text-white border-[#b70011]"
                       : isDarkMode
-                      ? "bg-[#111827] border-[#334155] text-slate-300 hover:bg-[#334155]"
-                      : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200"
+                        ? "bg-[#111827] border-[#334155] text-slate-300 hover:bg-[#334155]"
+                        : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200"
                   }`}
                 >
                   {u} {u === 1 ? "Unit" : u === 4 ? "Units (Trauma)" : "Units"}
@@ -201,9 +243,10 @@ export default function PatientDetailsSection({
         </div>
 
         {/* Clinical Purpose / Department */}
-        <div className="flex flex-col">
+        <div className="flex flex-col md:col-span-2">
           <label className="text-xs font-semibold mb-1.5 flex items-center gap-1">
-            Transfusion Purpose / Department <span className="text-[#b70011]">*</span>
+            Transfusion Purpose / Department{" "}
+            <span className="text-[#b70011]">*</span>
           </label>
           <div className="relative">
             <select
@@ -216,14 +259,26 @@ export default function PatientDetailsSection({
                   : "bg-slate-50 border-slate-200 text-[#0b1c30]"
               }`}
             >
-              <option value="" disabled>Select clinical indication...</option>
-              <option value="Emergency Trauma">Emergency Trauma &amp; Resuscitation</option>
+              <option value="" disabled>
+                Select clinical indication...
+              </option>
+              <option value="Emergency Trauma">
+                Emergency Trauma &amp; Resuscitation
+              </option>
               <option value="ICU / Critical Care">ICU / Critical Care</option>
-              <option value="Maternity & Obstetrics">Maternity &amp; Obstetrics (Labor/PPH)</option>
-              <option value="Cardiac Surgery">Cardiothoracic / Major Surgery</option>
-              <option value="Oncology / Dialysis">Oncology / Hematology / Dialysis</option>
+              <option value="Maternity & Obstetrics">
+                Maternity &amp; Obstetrics (Labor/PPH)
+              </option>
+              <option value="Cardiac Surgery">
+                Cardiothoracic / Major Surgery
+              </option>
+              <option value="Oncology / Dialysis">
+                Oncology / Hematology / Dialysis
+              </option>
               <option value="General Surgery">General Elective Surgery</option>
-              <option value="Pediatric">Pediatric / Neonatal Transfusion</option>
+              <option value="Pediatric">
+                Pediatric / Neonatal Transfusion
+              </option>
             </select>
             <span className="material-symbols-outlined absolute right-3 top-2.5 pointer-events-none text-slate-400 !text-[20px]">
               expand_more

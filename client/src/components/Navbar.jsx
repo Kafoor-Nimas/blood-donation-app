@@ -14,11 +14,13 @@ export default function Navbar() {
   } = useApp();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
 
   const dropdownRef = useRef(null);
   const searchRef = useRef(null);
+  const mobileMenuRef = useRef(null);
   const searchInputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -32,6 +34,7 @@ export default function Navbar() {
       if (e.key === "Escape") {
         setSearchOpen(false);
         setDropdownOpen(false);
+        setMobileMenuOpen(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -47,6 +50,12 @@ export default function Navbar() {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setSearchOpen(false);
       }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target)
+      ) {
+        setMobileMenuOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -54,6 +63,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     setDropdownOpen(false);
+    setMobileMenuOpen(false);
     if (logout) logout();
     navigate("/login");
   };
@@ -118,40 +128,63 @@ export default function Navbar() {
   const handleSearchSubmit = (e) => {
     if (e.key === "Enter" && searchQuery.trim()) {
       setSearchOpen(false);
+      setMobileMenuOpen(false);
       navigate(`/find-donors?search=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
+  const navLinks = [
+    { name: "Home", href: "/" },
+    { name: "Find Donors", href: "/find-donors" },
+    { name: "Blood Requests", href: "/blood-requests" },
+    { name: "About Us", href: "/about-us" },
+  ];
+
   return (
     <header
+      ref={mobileMenuRef}
       className={`fixed top-0 left-0 w-full z-50 backdrop-blur-xl transition-colors border-b ${
         isDarkMode
           ? "bg-[#0F172A]/90 border-[#334155] text-[#F8FAFC]"
           : "bg-white/90 border-slate-100 text-[#0b1c30]"
       }`}
     >
-      <div className="h-16 max-w-[1600px] mx-auto px-6 lg:px-12 flex items-center justify-between gap-4">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <span
-            className="material-symbols-outlined !text-[28px] text-[#b70011]"
-            style={{ fontSize: "28px" }}
+      <div className="h-16 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-2 sm:gap-4">
+        {/* Mobile Hamburger Button & Logo */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            aria-label="Toggle Navigation Menu"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            className={`lg:hidden p-2 rounded-xl transition-colors cursor-pointer ${
+              isDarkMode
+                ? "text-slate-300 hover:bg-[#1E293B]"
+                : "text-slate-700 hover:bg-slate-100"
+            }`}
           >
-            bloodtype
-          </span>
-          <span className="font-bold text-xl tracking-tight text-[#b70011]">
-            LifeLink
-          </span>
-        </Link>
+            <span className="material-symbols-outlined !text-[24px]">
+              {mobileMenuOpen ? "close" : "menu"}
+            </span>
+          </button>
 
-        {/* Navigation Links */}
+          {/* Logo */}
+          <Link
+            to="/"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-1.5 sm:gap-2"
+          >
+            <span className="material-symbols-outlined !text-[24px] sm:!text-[28px] text-[#b70011]">
+              bloodtype
+            </span>
+            <span className="font-bold text-lg sm:text-xl tracking-tight text-[#b70011]">
+              LifeLink
+            </span>
+          </Link>
+        </div>
+
+        {/* Desktop Navigation Links */}
         <nav className="hidden lg:flex items-center gap-1">
-          {[
-            { name: "Home", href: "/" },
-            { name: "Find Donors", href: "/find-donors" },
-            { name: "Blood Requests", href: "/blood-requests" },
-            { name: "About Us", href: "/about-us" },
-          ].map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.name}
               to={link.href}
@@ -167,7 +200,7 @@ export default function Navbar() {
         </nav>
 
         {/* Right Action Bar */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Search Input Container */}
           <div className="relative flex items-center" ref={searchRef}>
             <span
@@ -186,8 +219,8 @@ export default function Navbar() {
               }}
               onFocus={() => setSearchOpen(true)}
               onKeyDown={handleSearchSubmit}
-              placeholder="Search donors, requests..."
-              className={`w-36 sm:w-48 lg:w-60 text-xs pl-9 pr-8 py-2 rounded-xl border focus:outline-none transition-all ${
+              placeholder="Search..."
+              className={`w-28 xs:w-36 sm:w-48 lg:w-60 text-xs pl-9 pr-8 py-2 rounded-xl border focus:outline-none transition-all ${
                 isDarkMode
                   ? "bg-[#1E293B] border-[#334155] text-[#F8FAFC] placeholder-slate-400 focus:border-[#38BDF8]"
                   : "bg-slate-100 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:bg-white"
@@ -221,7 +254,7 @@ export default function Navbar() {
             {/* Live Search Results Popup Menu */}
             {searchOpen && searchQuery.trim().length > 0 && (
               <div
-                className={`absolute left-0 right-0 top-11 w-72 sm:w-80 rounded-2xl shadow-xl py-3 border z-50 transition-all ${
+                className={`absolute left-0 sm:right-0 top-11 w-64 sm:w-80 rounded-2xl shadow-xl py-3 border z-50 transition-all ${
                   isDarkMode
                     ? "bg-[#1E293B] border-[#334155] text-[#F8FAFC]"
                     : "bg-white border-slate-100 text-[#0b1c30]"
@@ -245,6 +278,7 @@ export default function Navbar() {
                             onClick={() => {
                               setSearchOpen(false);
                               setSearchQuery("");
+                              setMobileMenuOpen(false);
                               navigate("/find-donors");
                             }}
                             className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
@@ -286,6 +320,7 @@ export default function Navbar() {
                             onClick={() => {
                               setSearchOpen(false);
                               setSearchQuery("");
+                              setMobileMenuOpen(false);
                               navigate("/blood-requests");
                             }}
                             className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
@@ -340,7 +375,7 @@ export default function Navbar() {
 
           {/* Auth State Conditional Rendering */}
           <div
-            className={`pl-2 border-l ${
+            className={`pl-1.5 sm:pl-2 border-l ${
               isDarkMode ? "border-[#334155]" : "border-slate-200"
             }`}
           >
@@ -350,7 +385,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setDropdownOpen((prev) => !prev)}
-                  className={`flex items-center gap-2 p-1 rounded-xl transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 sm:gap-2 p-1 rounded-xl transition-all cursor-pointer ${
                     isDarkMode ? "hover:bg-[#1E293B]" : "hover:bg-slate-100"
                   }`}
                 >
@@ -360,7 +395,7 @@ export default function Navbar() {
                       "https://lh3.googleusercontent.com/aida-public/AB6AXuD2G3ltv8cQ0E23GIppn5aiMa68EYbw57Pw7NkBgHnBSezo_ivW0UrmgeHupmUISKVRWvOUot1oYvVyf_pLNs9xj8iolBHWPks9S-9CDvQYJM9LVO0LCF5BayrrXNFoT48c4nyajlq8wCIOfPwf3ArV2AooSQrERdporSrdN5SPNgr7Q-gH5BwKrBi9hmnrS56K3c2Tcs3J5Rr7bWQZ4Qju0OqGVW27sT8OMp21RcaN"
                     }
                     alt={user?.name || "Profile"}
-                    className="w-8 h-8 rounded-full object-cover ring-2 ring-[#b70011]/30"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-2 ring-[#b70011]/30"
                   />
                   <div className="hidden sm:flex flex-col text-left">
                     <span
@@ -386,7 +421,7 @@ export default function Navbar() {
                 {/* Dropdown Menu */}
                 {dropdownOpen && (
                   <div
-                    className={`absolute right-0 mt-2 w-56 rounded-2xl shadow-xl py-2 border z-50 transition-all ${
+                    className={`absolute right-0 mt-2 w-52 sm:w-56 rounded-2xl shadow-xl py-2 border z-50 transition-all ${
                       isDarkMode
                         ? "bg-[#1E293B] border-[#334155] text-[#F8FAFC]"
                         : "bg-white border-slate-100 text-[#0b1c30]"
@@ -466,7 +501,7 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/login"
-                className="flex items-center gap-1.5 px-4 py-2 bg-[#dc2626] hover:bg-[#b70011] text-white text-xs font-bold rounded-xl transition-all shadow-sm hover:shadow active:scale-95 cursor-pointer"
+                className="flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 bg-[#dc2626] hover:bg-[#b70011] text-white text-xs font-bold rounded-xl transition-all shadow-sm hover:shadow active:scale-95 cursor-pointer"
               >
                 <span className="material-symbols-outlined !text-[16px]">
                   login
@@ -477,6 +512,51 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Drawer Menu (Visible on lg:hidden when toggled) */}
+      {mobileMenuOpen && (
+        <div
+          className={`lg:hidden border-t transition-all px-4 py-3 space-y-2 ${
+            isDarkMode
+              ? "bg-[#0F172A] border-[#334155] text-white"
+              : "bg-white border-slate-100 text-[#0b1c30]"
+          }`}
+        >
+          <nav className="flex flex-col space-y-1">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-between ${
+                  isDarkMode
+                    ? "text-[#CBD5E1] hover:text-white hover:bg-[#1E293B]"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                }`}
+              >
+                <span>{link.name}</span>
+                <span className="material-symbols-outlined text-[16px] text-slate-400">
+                  chevron_right
+                </span>
+              </Link>
+            ))}
+          </nav>
+
+          {/* Quick Action in Mobile Menu */}
+          <div className="pt-2 border-t border-slate-100 dark:border-[#334155]">
+            <Link
+              to="/create-request"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#b70011] text-white text-xs font-bold rounded-xl shadow-sm hover:bg-[#90000d] transition-colors"
+            >
+              <span className="material-symbols-outlined !text-[18px]">
+                add_circle
+              </span>
+              <span>Create Blood Request</span>
+            </Link>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

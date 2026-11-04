@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useApp } from "../../context/AppContext";
 
+const ITEMS_PER_PAGE = 6;
+
 export default function RecentDonorsPanel() {
   const { isDarkMode, recentDonors, toggleUserStatus } = useApp();
   const [togglingId, setTogglingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleToggleStatus = async (donorId) => {
     setTogglingId(donorId);
@@ -19,6 +22,22 @@ export default function RecentDonorsPanel() {
   };
 
   const donorList = Array.isArray(recentDonors) ? recentDonors : [];
+
+  // Pagination calculations
+  const totalPages = Math.ceil(donorList.length / ITEMS_PER_PAGE) || 1;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentDonors = donorList.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
 
   return (
     <div
@@ -56,12 +75,12 @@ export default function RecentDonorsPanel() {
       </div>
 
       <div className="space-y-3">
-        {donorList.length === 0 ? (
+        {currentDonors.length === 0 ? (
           <div className="text-center py-6 text-xs text-slate-400">
             No donor registrations found.
           </div>
         ) : (
-          donorList.map((donor) => {
+          currentDonors.map((donor) => {
             const donorId = donor._id || donor.id;
             const bloodGroup = donor.bloodGroup || donor.group || "O+";
             const district = donor.district || donor.city || "Colombo";
@@ -166,6 +185,64 @@ export default function RecentDonorsPanel() {
           })
         )}
       </div>
+
+      {/* Pagination Footer Controls */}
+      {donorList.length > 0 && (
+        <div
+          className={`pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs border-t ${
+            isDarkMode
+              ? "border-[#334155] text-slate-400"
+              : "border-slate-100 text-slate-600"
+          }`}
+        >
+          <span>
+            Showing{" "}
+            <strong>
+              {startIndex + 1}-
+              {Math.min(startIndex + ITEMS_PER_PAGE, donorList.length)}
+            </strong>{" "}
+            of <strong>{donorList.length}</strong> total donors
+          </span>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className={`p-1.5 rounded-lg border font-semibold flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                isDarkMode
+                  ? "bg-[#0F172A] border-[#334155] text-slate-200 hover:bg-[#334155]"
+                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
+              }`}
+              title="Previous Donors"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                chevron_left
+              </span>
+            </button>
+
+            <span className="font-semibold text-xs px-1">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              type="button"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className={`p-1.5 rounded-lg border font-semibold flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                isDarkMode
+                  ? "bg-[#0F172A] border-[#334155] text-slate-200 hover:bg-[#334155]"
+                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
+              }`}
+              title="Next Donors"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                chevron_right
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

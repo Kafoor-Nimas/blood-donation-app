@@ -1,3 +1,4 @@
+// client/src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AppProvider } from "./context/AppContext";
@@ -28,7 +29,7 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/about-us" element={<About />} />
 
-            {/* Protected Routes (Require Authentication) */}
+            {/* Protected Routes (Require Any Authenticated User) */}
             <Route
               path="/create-request"
               element={
@@ -37,10 +38,12 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* Admin-Only Routes (Require role === "Admin") */}
             <Route
               path="/admin"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute adminOnly>
                   <AdminDashboard />
                 </ProtectedRoute>
               }
@@ -48,7 +51,7 @@ export default function App() {
             <Route
               path="/admin/donors"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute adminOnly>
                   <DonorManagement />
                 </ProtectedRoute>
               }

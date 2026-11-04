@@ -12,12 +12,32 @@ import adminRoutes from "./routes/adminRoutes.js";
 connectDB();
 
 const app = express();
+
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:5173",
+  "http://localhost:3000",
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: "http://localhost:5173", 
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     credentials: true,
-  })
+  }),
 );
+
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("LifeLink API Server is running successfully on Vercel.");
+});
+
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);

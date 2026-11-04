@@ -1,18 +1,52 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 
 export default function Navbar() {
-  const { isDarkMode, setIsDarkMode, user, isAuthenticated, logout } = useApp();
+  const {
+    isDarkMode,
+    setIsDarkMode,
+    user,
+    isAuthenticated,
+    logout,
+    recentDonors,
+    requests,
+  } = useApp();
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+
   const dropdownRef = useRef(null);
+  const searchRef = useRef(null);
+  const searchInputRef = useRef(null);
   const navigate = useNavigate();
 
-  // Close dropdown when clicking anywhere outside
+  // Global Keyboard Shortcut: ⌘K or Ctrl+K to focus search bar
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        setSearchOpen(true);
+      }
+      if (e.key === "Escape") {
+        setSearchOpen(false);
+        setDropdownOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSearchOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -23,6 +57,71 @@ export default function Navbar() {
     setDropdownOpen(false);
     if (logout) logout();
     navigate("/login");
+  };
+
+  // Filtered Donors & Requests Search Results (Guarded & Multi-field)
+  const searchResults = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return { donors: [], requests: [] };
+
+    const donorsList = Array.isArray(recentDonors) ? recentDonors : [];
+    const requestsList = Array.isArray(requests) ? requests : [];
+
+    const matchedDonors = donorsList
+      .filter((donor) => {
+        const name = (donor.name || donor.userName || "").toLowerCase();
+        const blood = (
+          donor.bloodGroup ||
+          donor.group ||
+          donor.blood ||
+          ""
+        ).toLowerCase();
+        const district = (
+          donor.district ||
+          donor.city ||
+          donor.location ||
+          ""
+        ).toLowerCase();
+        const role = (donor.role || "").toLowerCase();
+        const email = (donor.email || "").toLowerCase();
+
+        return (
+          name.includes(query) ||
+          blood.includes(query) ||
+          district.includes(query) ||
+          role.includes(query) ||
+          email.includes(query)
+        );
+      })
+      .slice(0, 4);
+
+    const matchedRequests = requestsList
+      .filter((req) => {
+        const hospital = (req.hospitalName || req.hospital || "").toLowerCase();
+        const blood = (req.bloodGroup || req.blood || "").toLowerCase();
+        const patient = (req.patientName || req.requester || "").toLowerCase();
+        const city = (req.city || req.district || "").toLowerCase();
+
+        return (
+          hospital.includes(query) ||
+          blood.includes(query) ||
+          patient.includes(query) ||
+          city.includes(query)
+        );
+      })
+      .slice(0, 4);
+
+    return { donors: matchedDonors, requests: matchedRequests };
+  }, [searchQuery, recentDonors, requests]);
+
+  const hasResults =
+    searchResults.donors.length > 0 || searchResults.requests.length > 0;
+
+  const handleSearchSubmit = (e) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      setSearchOpen(false);
+      navigate(`/find-donors?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   return (
@@ -71,8 +170,8 @@ export default function Navbar() {
 
         {/* Right Action Bar */}
         <div className="flex items-center gap-3">
-          {/* Search Input */}
-          <div className="relative flex items-center">
+          {/* Search Input Container */}
+          <div className="relative flex items-center" ref={searchRef}>
             <span
               className="material-symbols-outlined absolute left-3 pointer-events-none text-[18px]"
               style={{ color: isDarkMode ? "#94A3B8" : "#64748B" }}
@@ -80,7 +179,15 @@ export default function Navbar() {
               search
             </span>
             <input
+              ref={searchInputRef}
               type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSearchOpen(true);
+              }}
+              onFocus={() => setSearchOpen(true)}
+              onKeyDown={handleSearchSubmit}
               placeholder="Search donors, requests..."
               className={`w-36 sm:w-48 lg:w-60 text-xs pl-9 pr-8 py-2 rounded-xl border focus:outline-none transition-all ${
                 isDarkMode
@@ -88,15 +195,133 @@ export default function Navbar() {
                   : "bg-slate-100 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:bg-white"
               }`}
             />
-            <kbd
-              className={`hidden xl:inline-block absolute right-2.5 text-[10px] px-1.5 py-0.5 rounded font-mono pointer-events-none ${
-                isDarkMode
-                  ? "bg-[#0F172A] text-slate-400"
-                  : "bg-white border border-slate-200 text-slate-400"
-              }`}
-            >
-              ⌘K
-            </kbd>
+            {searchQuery ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSearchOpen(false);
+                }}
+                className="absolute right-2.5 text-slate-400 hover:text-slate-600"
+              >
+                <span className="material-symbols-outlined text-[16px]">
+                  close
+                </span>
+              </button>
+            ) : (
+              <kbd
+                className={`hidden xl:inline-block absolute right-2.5 text-[10px] px-1.5 py-0.5 rounded font-mono pointer-events-none ${
+                  isDarkMode
+                    ? "bg-[#0F172A] text-slate-400"
+                    : "bg-white border border-slate-200 text-slate-400"
+                }`}
+              >
+                ⌘K
+              </kbd>
+            )}
+
+            {/* Live Search Results Popup Menu */}
+            {searchOpen && searchQuery.trim().length > 0 && (
+              <div
+                className={`absolute left-0 right-0 top-11 w-72 sm:w-80 rounded-2xl shadow-xl py-3 border z-50 transition-all ${
+                  isDarkMode
+                    ? "bg-[#1E293B] border-[#334155] text-[#F8FAFC]"
+                    : "bg-white border-slate-100 text-[#0b1c30]"
+                }`}
+              >
+                {!hasResults ? (
+                  <div className="px-4 py-3 text-center text-xs text-slate-400">
+                    No matching donors or requests found.
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-80 overflow-y-auto px-2">
+                    {/* Donors Group */}
+                    {searchResults.donors.length > 0 && (
+                      <div>
+                        <div className="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-[#b70011]">
+                          Donors ({searchResults.donors.length})
+                        </div>
+                        {searchResults.donors.map((donor) => (
+                          <div
+                            key={donor._id || donor.id}
+                            onClick={() => {
+                              setSearchOpen(false);
+                              setSearchQuery("");
+                              navigate("/find-donors");
+                            }}
+                            className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
+                              isDarkMode
+                                ? "hover:bg-[#0F172A]"
+                                : "hover:bg-slate-50"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="w-6 h-6 rounded-full bg-red-100 text-[#b70011] font-bold text-[10px] flex items-center justify-center shrink-0">
+                                {donor.bloodGroup || donor.group || "O+"}
+                              </span>
+                              <div className="truncate max-w-[130px]">
+                                <p className="font-semibold truncate">
+                                  {donor.name}
+                                </p>
+                                <p className="text-[10px] text-slate-400 truncate">
+                                  {donor.district || donor.city || "Colombo"}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="material-symbols-outlined text-[16px] text-slate-400">
+                              chevron_right
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Blood Requests Group */}
+                    {searchResults.requests.length > 0 && (
+                      <div>
+                        <div className="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-amber-500">
+                          Blood Requests ({searchResults.requests.length})
+                        </div>
+                        {searchResults.requests.map((req) => (
+                          <div
+                            key={req._id || req.id}
+                            onClick={() => {
+                              setSearchOpen(false);
+                              setSearchQuery("");
+                              navigate("/blood-requests");
+                            }}
+                            className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
+                              isDarkMode
+                                ? "hover:bg-[#0F172A]"
+                                : "hover:bg-slate-50"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-700 font-bold text-[10px] flex items-center justify-center shrink-0">
+                                {req.bloodGroup || "O+"}
+                              </span>
+                              <div className="truncate max-w-[130px]">
+                                <p className="font-semibold truncate">
+                                  {req.hospitalName ||
+                                    req.hospital ||
+                                    "Hospital"}
+                                </p>
+                                <p className="text-[10px] text-slate-400 truncate">
+                                  For {req.patientName || "Patient"}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="material-symbols-outlined text-[16px] text-slate-400">
+                              chevron_right
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Dark Mode Toggle */}
@@ -169,14 +394,16 @@ export default function Navbar() {
                         : "bg-white border-slate-100 text-[#0b1c30]"
                     }`}
                   >
-                    {/* User Header Info in Menu */}
                     <div className="px-4 py-2 border-b border-slate-100 dark:border-[#334155]">
-                      <p className="text-xs font-bold truncate">{user?.name || "User"}</p>
-                      <p className="text-[10px] text-slate-400 truncate">{user?.email || ""}</p>
+                      <p className="text-xs font-bold truncate">
+                        {user?.name || "User"}
+                      </p>
+                      <p className="text-[10px] text-slate-400 truncate">
+                        {user?.email || ""}
+                      </p>
                     </div>
 
                     <div className="py-1">
-                      {/* Profile Link */}
                       <Link
                         to="/profile"
                         onClick={() => setDropdownOpen(false)}
@@ -192,7 +419,6 @@ export default function Navbar() {
                         <span>Profile</span>
                       </Link>
 
-                      {/* Admin Dashboard Link */}
                       <Link
                         to="/admin"
                         onClick={() => setDropdownOpen(false)}
@@ -208,7 +434,6 @@ export default function Navbar() {
                         <span>Admin Dashboard</span>
                       </Link>
 
-                      {/* Create Blood Request Link */}
                       <Link
                         to="/create-request"
                         onClick={() => setDropdownOpen(false)}
@@ -225,12 +450,11 @@ export default function Navbar() {
                       </Link>
                     </div>
 
-                    {/* Log Out Button */}
                     <div className="pt-1 border-t border-slate-100 dark:border-[#334155]">
                       <button
                         type="button"
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-500/10 transition-colors text-left"
+                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-500/10 transition-colors text-left cursor-pointer"
                       >
                         <span className="material-symbols-outlined !text-[18px]">
                           logout

@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useApp } from "../../context/AppContext";
+
+const ITEMS_PER_PAGE = 6;
 
 export default function AdminRequestTable() {
   const { isDarkMode, requests, updateRequestStatus } = useApp();
@@ -7,6 +9,7 @@ export default function AdminRequestTable() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [bloodFilter, setBloodFilter] = useState("ALL");
   const [updatingId, setUpdatingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Status Change Handler connected to API
   const handleStatusChange = async (reqId, newStatus) => {
@@ -25,32 +28,66 @@ export default function AdminRequestTable() {
   const requestsList = Array.isArray(requests) ? requests : [];
 
   // Filter requests based on search term and dropdown selectors
-  const filteredRequests = requestsList.filter((req) => {
-    const idStr = req._id ? req._id.slice(-6).toUpperCase() : req.id || "";
-    const hospitalStr = req.hospitalName || req.hospital || "";
-    const requesterStr = req.patientName || req.requester || "";
-    const bloodStr = req.bloodGroup || "";
-    const urgencyStr = (req.urgency || "").toLowerCase();
-    const statusStr = req.status || "Open";
+  const filteredRequests = useMemo(() => {
+    return requestsList.filter((req) => {
+      const idStr = req._id ? req._id.slice(-6).toUpperCase() : req.id || "";
+      const hospitalStr = req.hospitalName || req.hospital || "";
+      const requesterStr = req.patientName || req.requester || "";
+      const bloodStr = req.bloodGroup || "";
+      const urgencyStr = (req.urgency || "").toLowerCase();
+      const statusStr = req.status || "Open";
 
-    const matchesSearch =
-      idStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hospitalStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      requesterStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bloodStr.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch =
+        idStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        hospitalStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        requesterStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bloodStr.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const isCritical =
-      urgencyStr === "critical" || urgencyStr === "urgent" || req.isCritical;
+      const isCritical =
+        urgencyStr === "critical" || urgencyStr === "urgent" || req.isCritical;
 
-    const matchesStatus =
-      statusFilter === "ALL" ||
-      (statusFilter === "Urgent" && isCritical) ||
-      statusStr.toLowerCase() === statusFilter.toLowerCase();
+      const matchesStatus =
+        statusFilter === "ALL" ||
+        (statusFilter === "Urgent" && isCritical) ||
+        statusStr.toLowerCase() === statusFilter.toLowerCase();
 
-    const matchesBlood = bloodFilter === "ALL" || bloodStr === bloodFilter;
+      const matchesBlood = bloodFilter === "ALL" || bloodStr === bloodFilter;
 
-    return matchesSearch && matchesStatus && matchesBlood;
-  });
+      return matchesSearch && matchesStatus && matchesBlood;
+    });
+  }, [requestsList, searchTerm, statusFilter, bloodFilter]);
+
+  // Reset to page 1 whenever search or filters change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleStatusFilterChange = (e) => {
+    setStatusFilter(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleBloodFilterChange = (e) => {
+    setBloodFilter(e.target.value);
+    setCurrentPage(1);
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredRequests.length / ITEMS_PER_PAGE) || 1;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentRequests = filteredRequests.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
 
   return (
     <div
@@ -89,7 +126,7 @@ export default function AdminRequestTable() {
             <input
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               placeholder="Search hospital, ID, or blood..."
               className={`w-full pl-9 pr-4 py-2 text-xs rounded-lg outline-none transition-colors ${
                 isDarkMode
@@ -102,7 +139,7 @@ export default function AdminRequestTable() {
           {/* Status Dropdown Filter */}
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={handleStatusFilterChange}
             className={`px-3 py-2 text-xs rounded-lg outline-none cursor-pointer font-medium ${
               isDarkMode
                 ? "bg-[#0F172A] text-white border border-[#334155]"
@@ -119,7 +156,7 @@ export default function AdminRequestTable() {
           {/* Blood Group Filter */}
           <select
             value={bloodFilter}
-            onChange={(e) => setBloodFilter(e.target.value)}
+            onChange={handleBloodFilterChange}
             className={`px-3 py-2 text-xs rounded-lg outline-none cursor-pointer font-medium ${
               isDarkMode
                 ? "bg-[#0F172A] text-white border border-[#334155]"
@@ -163,14 +200,14 @@ export default function AdminRequestTable() {
               isDarkMode ? "divide-[#334155]" : "divide-slate-100"
             }`}
           >
-            {filteredRequests.length === 0 ? (
+            {currentRequests.length === 0 ? (
               <tr>
                 <td colSpan="6" className="py-8 text-center text-slate-400">
                   No blood requests match your current filters.
                 </td>
               </tr>
             ) : (
-              filteredRequests.map((req) => {
+              currentRequests.map((req) => {
                 const reqId = req._id || req.id;
                 const formattedId = req._id
                   ? `#REQ-${req._id.slice(-5).toUpperCase()}`
@@ -269,20 +306,20 @@ export default function AdminRequestTable() {
                                 ? "bg-red-950/90 text-red-200 animate-pulse"
                                 : "bg-red-100 text-[#b70011] animate-pulse"
                               : status === "Fulfilled"
-                                ? isDarkMode
-                                  ? "bg-emerald-950/90 text-emerald-200"
-                                  : "bg-emerald-100 text-[#008438]"
-                                : isDarkMode
-                                  ? "bg-[#0F172A] text-slate-300"
-                                  : "bg-slate-100 text-slate-600"
+                              ? isDarkMode
+                                ? "bg-emerald-950/90 text-emerald-200"
+                                : "bg-emerald-100 text-[#008438]"
+                              : isDarkMode
+                              ? "bg-[#0F172A] text-slate-300"
+                              : "bg-slate-100 text-slate-600"
                           }`}
                         >
                           <span className="material-symbols-outlined text-[13px]">
                             {isCritical
                               ? "crisis_alert"
                               : status === "Fulfilled"
-                                ? "check"
-                                : "schedule"}
+                              ? "check"
+                              : "schedule"}
                           </span>
                           <span className="capitalize">{urgency}</span>
                         </span>
@@ -373,7 +410,7 @@ export default function AdminRequestTable() {
         </table>
       </div>
 
-      {/* Table Footer */}
+      {/* Table Footer with Pagination Arrows */}
       <div
         className={`p-4 px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs border-t ${
           isDarkMode
@@ -382,9 +419,51 @@ export default function AdminRequestTable() {
         }`}
       >
         <span>
-          Showing <strong>{filteredRequests.length}</strong> of{" "}
-          <strong>{requestsList.length}</strong> total blood requests
+          Showing{" "}
+          <strong>
+            {filteredRequests.length > 0 ? startIndex + 1 : 0}-
+            {Math.min(startIndex + ITEMS_PER_PAGE, filteredRequests.length)}
+          </strong>{" "}
+          of <strong>{filteredRequests.length}</strong> filtered requests (
+          <strong>{requestsList.length}</strong> total)
         </span>
+
+        {/* Arrow Pagination Controls */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className={`p-1.5 rounded-lg border font-semibold flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+              isDarkMode
+                ? "bg-[#1E293B] border-[#334155] text-slate-200 hover:bg-[#334155]"
+                : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
+            }`}
+            title="Previous Page"
+          >
+            <span className="material-symbols-outlined text-[18px]">
+              chevron_left
+            </span>
+          </button>
+
+          <span className="font-semibold text-xs px-1">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className={`p-1.5 rounded-lg border font-semibold flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+              isDarkMode
+                ? "bg-[#1E293B] border-[#334155] text-slate-200 hover:bg-[#334155]"
+                : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
+            }`}
+            title="Next Page"
+          >
+            <span className="material-symbols-outlined text-[18px]">
+              chevron_right
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );

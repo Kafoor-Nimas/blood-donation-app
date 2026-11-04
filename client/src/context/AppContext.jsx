@@ -81,9 +81,13 @@ export const AppProvider = ({ children }) => {
       const response = await API.patch(`/admin/toggle-status/${donorId}`);
       if (response.data.success) {
         const updatedDonor = response.data.donor;
+
+        // Update recentDonors array in state immediately
         setRecentDonors((prev) =>
           prev.map((d) =>
-            d._id === donorId ? { ...d, isActive: updatedDonor.isActive } : d,
+            d._id === donorId || d.id === donorId
+              ? { ...d, isActive: updatedDonor.isActive }
+              : d,
           ),
         );
       }

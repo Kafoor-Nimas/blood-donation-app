@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, required: true },
     isAvailable: { type: Boolean, default: true },
     isVerified: { type: Boolean, default: false },
+    isActive: { type: Boolean, default: true }, 
     lastDonatedAt: { type: Date },
 
     // Clinical & Profile Details (Editable by Donor)

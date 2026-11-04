@@ -40,3 +40,4 @@ export const toggleDonorAvailability = async (req, res) => {
     });
   }
 };
+

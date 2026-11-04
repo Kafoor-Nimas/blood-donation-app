@@ -57,24 +57,25 @@ export const verifyDonor = async (req, res) => {
   }
 };
 
+
 export const toggleUserStatus = async (req, res) => {
   try {
-    const donor = await User.findById(req.params.id);
-    if (!donor) {
+    const user = await User.findById(req.params.id);
+    if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Donor not found",
+        message: "User not found",
       });
     }
 
-    // Toggle active status (defaults to true if undefined)
-    donor.isActive = donor.isActive !== undefined ? !donor.isActive : false;
-    await donor.save();
+    // Toggle isActive status
+    user.isActive = user.isActive === undefined ? false : !user.isActive;
+    await user.save();
 
     res.status(200).json({
       success: true,
-      message: `Donor status updated to ${donor.isActive ? "Active" : "Suspended"}`,
-      donor,
+      message: `User status changed to ${user.isActive ? "Active" : "Suspended"}`,
+      donor: user,
     });
   } catch (error) {
     console.error("Error toggling user status:", error);

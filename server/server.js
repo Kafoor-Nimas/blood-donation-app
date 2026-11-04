@@ -15,17 +15,21 @@ const app = express();
 
 const allowedOrigins = [
   process.env.CLIENT_URL,
+  "https://blood-donation-app-frontend-cny724man-nimas-projects-d027bc7f.vercel.app",
   "http://localhost:5173",
-  "http://localhost:3000",
 ].filter(Boolean);
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+    origin: function (origin, callback) {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
         callback(null, true);
       } else {
-        callback(null, true);
+        callback(new Error("CORS policy violation"));
       }
     },
     credentials: true,
@@ -35,15 +39,17 @@ app.use(
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("LifeLink API Server is running successfully on Vercel.");
+  res.send("LifeLink API Server Running");
 });
-
-app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/donors", donorRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/admin", adminRoutes);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+export default app;

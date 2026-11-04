@@ -11,7 +11,6 @@ export default function AdminRequestTable() {
   const [updatingId, setUpdatingId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Status Change Handler connected to API
   const handleStatusChange = async (reqId, newStatus) => {
     setUpdatingId(reqId);
     try {
@@ -27,7 +26,6 @@ export default function AdminRequestTable() {
 
   const requestsList = Array.isArray(requests) ? requests : [];
 
-  // Filter requests based on search term and dropdown selectors
   const filteredRequests = useMemo(() => {
     return requestsList.filter((req) => {
       const idStr = req._id ? req._id.slice(-6).toUpperCase() : req.id || "";
@@ -57,7 +55,6 @@ export default function AdminRequestTable() {
     });
   }, [requestsList, searchTerm, statusFilter, bloodFilter]);
 
-  // Reset to page 1 whenever search or filters change
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
@@ -73,7 +70,6 @@ export default function AdminRequestTable() {
     setCurrentPage(1);
   };
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredRequests.length / ITEMS_PER_PAGE) || 1;
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentRequests = filteredRequests.slice(

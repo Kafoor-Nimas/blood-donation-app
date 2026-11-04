@@ -22,7 +22,6 @@ export default function Navbar() {
   const searchInputRef = useRef(null);
   const navigate = useNavigate();
 
-  // Global Keyboard Shortcut: ⌘K or Ctrl+K to focus search bar
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -59,7 +58,6 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  // Filtered Donors & Requests Search Results (Guarded & Multi-field)
   const searchResults = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return { donors: [], requests: [] };

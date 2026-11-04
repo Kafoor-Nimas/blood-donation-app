@@ -30,14 +30,12 @@ export default function FindDonors() {
   const [contactDonor, setContactDonor] = useState(null);
   const [profileDonor, setProfileDonor] = useState(null);
 
-  // 1. Fetch Donors from Backend API
   const fetchDonors = async () => {
     setLoading(true);
     setErrorMessage("");
     try {
       const response = await API.get("/donors");
 
-      // Extract array payload safely whether wrapped or direct
       const data = Array.isArray(response.data)
         ? response.data
         : response.data?.donors || response.data?.data || INITIAL_DONORS_DATA;
@@ -48,7 +46,6 @@ export default function FindDonors() {
       setErrorMessage(
         "Could not load live donor network. Showing cached results.",
       );
-      // Fallback to initial mock data on error so UI remains responsive
       setDonors(INITIAL_DONORS_DATA || []);
     } finally {
       setLoading(false);
@@ -59,7 +56,6 @@ export default function FindDonors() {
     fetchDonors();
   }, []);
 
-  // Reset to Page 1 whenever filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [
@@ -70,12 +66,11 @@ export default function FindDonors() {
     itemsPerPage,
   ]);
 
-  // 2. Filter Logic (Applies to fetched API donor array)
   const filteredDonors = useMemo(() => {
     const list = Array.isArray(donors) ? donors : [];
 
     return list.filter((donor) => {
-      // Blood Group filter matching either 'group' or 'bloodGroup' keys
+      // Blood Group filter
       const donorGroup = donor.group || donor.bloodGroup;
       if (activeGroup !== "ALL" && donorGroup !== activeGroup) return false;
 
@@ -100,7 +95,6 @@ export default function FindDonors() {
     });
   }, [donors, activeGroup, activeDistrict, searchQuery, showAvailableOnly]);
 
-  // 3. Pagination Calculations
   const totalPages = Math.ceil(filteredDonors.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentDonors = useMemo(() => {

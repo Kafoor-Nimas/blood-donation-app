@@ -10,7 +10,6 @@ export default function RequestCard({ request, onFulfill }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // 1. Normalize Backend MongoDB vs Mock Fields
   const id = request._id
     ? request._id.slice(-6).toUpperCase()
     : request.id || "N/A";

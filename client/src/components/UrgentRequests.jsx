@@ -3,7 +3,6 @@ import { useApp } from "../context/AppContext";
 export default function UrgentRequests() {
   const { isDarkMode, requests, loadingRequests } = useApp();
 
-  // Safely extract array & filter active/urgent requests (limit to 3 for landing section)
   const rawRequests = Array.isArray(requests) ? requests : [];
 
   const urgentList = rawRequests

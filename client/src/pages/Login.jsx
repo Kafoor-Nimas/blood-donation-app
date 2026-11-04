@@ -26,11 +26,9 @@ export default function Login() {
     setIsSubmitting(true);
 
     try {
-      // Live API Call to Backend
       const response = await API.post("/auth/login", { email, password });
       const { token, user } = response.data;
 
-      // Save JWT Token & Update Global Context User
       localStorage.setItem("lifelink_token", token);
       if (setUser) {
         setUser(user);
@@ -39,7 +37,6 @@ export default function Login() {
       setIsSubmitting(false);
       setIsAuthorized(true);
 
-      // Brief visual confirmation before routing based on role
       setTimeout(() => {
         if (user?.role === "Admin") {
           navigate("/admin");

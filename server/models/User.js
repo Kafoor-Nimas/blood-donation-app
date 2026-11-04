@@ -16,14 +16,13 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     district: { type: String, required: true },
-    city: { type: String }, // Added for refined location matching
+    city: { type: String },
     phone: { type: String, required: true },
     isAvailable: { type: Boolean, default: true },
     isVerified: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true }, 
     lastDonatedAt: { type: Date },
 
-    // Clinical & Profile Details (Editable by Donor)
     preferredCenters: { type: String },
     facility: { type: String },
     hemoglobin: { type: String, default: "13.8 g/dL (Normal)" },

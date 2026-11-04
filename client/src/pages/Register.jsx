@@ -63,7 +63,6 @@ export default function Register() {
     setIsSubmitting(true);
 
     try {
-      // Live API Call to Backend with selected role
       const response = await API.post("/auth/register", {
         name: fullName,
         email,
@@ -76,7 +75,6 @@ export default function Register() {
 
       const { token, user } = response.data;
 
-      // Save JWT Token & Update Global User State
       localStorage.setItem("lifelink_token", token);
       if (setUser) {
         setUser(user);

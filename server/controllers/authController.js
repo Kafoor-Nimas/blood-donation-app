@@ -7,7 +7,6 @@ export const registerUser = async (req, res) => {
     const { name, email, password, role, bloodGroup, district, phone, city } =
       req.body;
 
-    // 1. Core validation
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -17,7 +16,6 @@ export const registerUser = async (req, res) => {
 
     const userRole = role || "Donor";
 
-    // 2. Role-specific validation
     if (userRole === "Donor" && (!bloodGroup || !phone)) {
       return res.status(400).json({
         success: false,
@@ -35,7 +33,6 @@ export const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3. Fallbacks to prevent Mongoose Schema validation error
     const validBloodGroup =
       bloodGroup &&
       ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].includes(bloodGroup)
@@ -50,7 +47,7 @@ export const registerUser = async (req, res) => {
       bloodGroup: validBloodGroup,
       district: district || "Colombo",
       city: city || district || "Colombo",
-      phone: phone || "N/A", // Prevents empty string breaking required check
+      phone: phone || "N/A", 
       isAvailable: true,
     });
 
@@ -61,7 +58,6 @@ export const registerUser = async (req, res) => {
       expiresIn: "7d",
     });
 
-    // 4. Convert to JSON object to include virtuals
     const userObj = user.toJSON();
     delete userObj.password;
 
@@ -145,7 +141,6 @@ export const getMe = async (req, res) => {
       });
     }
 
-    // req.user is already populated by protect middleware
     res.status(200).json({
       success: true,
       user: req.user,

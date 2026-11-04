@@ -3,7 +3,6 @@ import { useApp } from "../context/AppContext";
 export default function DonorCard({ donor, onRequestContact, onViewProfile }) {
   const { isDarkMode } = useApp();
 
-  // Normalize backend MongoDB fields vs mock data fields
   const bloodGroup = donor?.bloodGroup || donor?.group || "O+";
   const isAvailable = donor?.isAvailable ?? donor?.available ?? true;
   const status = donor?.status || (isAvailable ? "Available" : "In Cooldown");

@@ -25,7 +25,6 @@ export const createBloodRequest = async (req, res) => {
       contactPhone,
     });
 
-    // Email alert trigger for matching donors in same city
     const matchingDonors = await User.find({
       bloodGroup,
       city: new RegExp(city, "i"),
@@ -91,7 +90,6 @@ export const updateRequestStatus = async (req, res) => {
     }
 
     if (status) {
-      // Map legacy or lowercase status values to allowed schema enum values
       if (status.toLowerCase() === "open") status = "Open";
       if (status.toLowerCase() === "pending") status = "Pending";
       if (status.toLowerCase() === "under coordination")

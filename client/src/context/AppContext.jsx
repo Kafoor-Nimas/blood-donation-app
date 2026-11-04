@@ -24,8 +24,7 @@ export const AppProvider = ({ children }) => {
   const [recentDonors, setRecentDonors] = useState([]);
   const [adminLoading, setAdminLoading] = useState(false);
 
-  // 1. Verify existing auth token on initial app load
-  // client/src/context/AppContext.jsx
+  
   useEffect(() => {
     const checkAuthStatus = async () => {
       const token = localStorage.getItem("lifelink_token");
@@ -42,7 +41,6 @@ export const AppProvider = ({ children }) => {
       } catch (error) {
         console.error("Session verification failed:", error);
 
-        // ONLY clear token if backend explicitly rejects credentials (401/403)
         if (error.response?.status === 401 || error.response?.status === 403) {
           localStorage.removeItem("lifelink_token");
           setUser(null);
@@ -62,7 +60,6 @@ export const AppProvider = ({ children }) => {
       });
 
       if (response.data) {
-        // Optimistically update requests in local state
         setRequests((prevRequests) =>
           prevRequests.map((req) =>
             req._id === requestId || req.id === requestId
@@ -78,7 +75,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // 2. Fetch Blood Requests
   const fetchRequests = async () => {
     setLoadingRequests(true);
     try {
@@ -106,7 +102,6 @@ export const AppProvider = ({ children }) => {
       if (response.data.success) {
         const updatedDonor = response.data.donor;
 
-        // Update recentDonors array in state immediately
         setRecentDonors((prev) =>
           prev.map((d) =>
             d._id === donorId || d.id === donorId
@@ -153,7 +148,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // 3. Login Handler
   const login = async (credentials) => {
     const response = await API.post("/auth/login", credentials);
     const { token, user: userData } = response.data;
@@ -162,13 +156,11 @@ export const AppProvider = ({ children }) => {
     return response.data;
   };
 
-  // 4. Logout Handler
   const logout = () => {
     localStorage.removeItem("lifelink_token");
     setUser(null);
   };
 
-  // 5. Add Blood Request
   const addBloodRequest = async (newReqData) => {
     try {
       const response = await API.post("/requests", newReqData);
@@ -185,7 +177,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Sync dark mode class
   useEffect(() => {
     const root = document.documentElement;
     if (isDarkMode) {

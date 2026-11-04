@@ -68,7 +68,6 @@ export const toggleUserStatus = async (req, res) => {
       });
     }
 
-    // Toggle isActive status
     user.isActive = user.isActive === undefined ? false : !user.isActive;
     await user.save();
 

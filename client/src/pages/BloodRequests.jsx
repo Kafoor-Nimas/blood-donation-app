@@ -38,19 +38,16 @@ export default function BloodRequests() {
   const [tickerIndex, setTickerIndex] = useState(0);
   const [tickerFade, setTickerFade] = useState(true);
 
-  // Fetch latest requests when component mounts
   useEffect(() => {
     if (fetchRequests) {
       fetchRequests();
     }
   }, []);
 
-  // Reset to page 1 whenever filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [statusTab, bloodFilter, districtFilter, urgencyFilter]);
 
-  // Live Activity Ticker Loop
   useEffect(() => {
     const interval = setInterval(() => {
       setTickerFade(false);
@@ -62,7 +59,6 @@ export default function BloodRequests() {
     return () => clearInterval(interval);
   }, [tickerItems.length]);
 
-  // Live Toast Loop
   useEffect(() => {
     const toastMessages = [
       "Someone responded to Blood Request in Kandy 2 mins ago.",
@@ -79,7 +75,6 @@ export default function BloodRequests() {
     return () => clearInterval(interval);
   }, [showToast]);
 
-  // Normalized Multi-Filter Logic
   const filteredRequests = useMemo(() => {
     const list = Array.isArray(requests) ? requests : [];
 
@@ -87,7 +82,7 @@ export default function BloodRequests() {
       const itemStatus = (item.status || "Pending").toLowerCase();
       const itemUrgency = (item.urgency || "standard").toLowerCase();
 
-      // 1. Status Tab Filter
+      // Status Tab Filter
       if (statusTab === "urgent") {
         if (itemUrgency !== "urgent" && itemUrgency !== "critical")
           return false;
@@ -97,10 +92,10 @@ export default function BloodRequests() {
         if (itemStatus !== "fulfilled") return false;
       }
 
-      // 2. Blood Group Filter
+      // Blood Group Filter
       if (bloodFilter && item.bloodGroup !== bloodFilter) return false;
 
-      // 3. District / Location Filter
+      //District / Location Filter
       const itemLocation =
         `${item.district || ""} ${item.city || ""}`.toLowerCase();
       if (
@@ -110,7 +105,7 @@ export default function BloodRequests() {
         return false;
       }
 
-      // 4. Urgency Filter Dropdown
+      // Urgency Filter Dropdown
       if (urgencyFilter) {
         if (
           urgencyFilter === "urgent" &&
@@ -132,7 +127,6 @@ export default function BloodRequests() {
     });
   }, [requests, statusTab, bloodFilter, districtFilter, urgencyFilter]);
 
-  // Pagination Calculations (9 per page)
   const totalPages = Math.ceil(filteredRequests.length / ITEMS_PER_PAGE) || 1;
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentRequests = useMemo(() => {
@@ -147,7 +141,6 @@ export default function BloodRequests() {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
-  // Dynamic Tab Counts Calculation
   const counts = useMemo(() => {
     const list = Array.isArray(requests) ? requests : [];
     return {

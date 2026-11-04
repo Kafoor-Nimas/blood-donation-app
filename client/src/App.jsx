@@ -11,7 +11,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import AdminDashboard from "./pages/AdminDashboard";
 import About from "./pages/About";
 import DonorManagement from "./pages/DonorManagement";
-// import Products from "./pages/Products";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
@@ -20,17 +20,39 @@ export default function App() {
         <ScrollToTop />
         <div className="min-h-screen flex flex-col">
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/find-donors" element={<FindDonors />} />
             <Route path="/blood-requests" element={<BloodRequests />} />
-            <Route path="/create-request" element={<CreateRequest />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/about-us" element={<About />} />
-            <Route path="/admin/donors" element={<DonorManagement />} />
-            {/* <Route path="/products" element={<Products />} />
-             */}
+
+            {/* Protected Routes (Require Authentication) */}
+            <Route
+              path="/create-request"
+              element={
+                <ProtectedRoute>
+                  <CreateRequest />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/donors"
+              element={
+                <ProtectedRoute>
+                  <DonorManagement />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </div>
       </Router>

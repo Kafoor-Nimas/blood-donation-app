@@ -13,11 +13,21 @@ export const protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select("-password");
+    
+    // Support both decoded.id and decoded._id safely
+    const userId = decoded.id || decoded._id;
+    req.user = await User.findById(userId).select("-password");
+
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "User no longer exists",
+      });
+    }
 
     next();
   } catch (error) {
-    console.error(error);
+    console.error("Auth Middleware Error:", error);
     res.status(401).json({
       success: false,
       message: "Invalid or expired token",
@@ -25,7 +35,6 @@ export const protect = async (req, res, next) => {
     });
   }
 };
-
 export const adminOnly = (req, res, next) => {
   if (req.user && req.user.role === "Admin") {
     next();

@@ -135,3 +135,27 @@ export const loginUser = async (req, res) => {
     });
   }
 };
+
+export const getMe = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    // req.user is already populated by protect middleware
+    res.status(200).json({
+      success: true,
+      user: req.user,
+    });
+  } catch (error) {
+    console.error("Error in getMe controller:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error during user retrieval",
+      error: error.message,
+    });
+  }
+};

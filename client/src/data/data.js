@@ -203,3 +203,43 @@ export const INITIAL_REQUESTS_DATA = [
     donorsInfo: "2 Donors confirmed",
   },
 ];
+
+export const initialDonors = [
+  {
+    id: 1,
+    name: "Chaminda Samarasinghe",
+    bloodGroup: "O-",
+    badge: "Medical Cleared",
+    badgeColor: "text-[#008438] bg-emerald-100 dark:bg-emerald-950/50",
+    district: "Colombo District (Gampaha)",
+    registeredTime: "Registered 12 min ago",
+    active: true,
+    avatar:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuCS1tT-x4pBVNKW2yjRfzmOiRE9tCRUO35fo_OR2BruZ34SnOfAKWu7ymDI9rIZ-OWiM5mLxMndztnPxC3ROwXrGb63EjptR8yJ1VCVYMX-R-BVAXTcyAEcz9pulImCN1bsuaqtq6wm8_8_kVWJjloigtottIr8e8392TmsfZaJGAzCE292uaHVyid8b2S_YATs3WpBOkTnmV7iaG9Eikm8X5p8oMyAgdeUWppZYcDM",
+  },
+  {
+    id: 2,
+    name: "Dilini Jayasekara",
+    bloodGroup: "A+",
+    badge: "ID Validated",
+    badgeColor: "text-[#008438] bg-emerald-50 dark:bg-emerald-950/50",
+    district: "Kandy District (Peradeniya)",
+    registeredTime: "Registered 48 min ago",
+    active: true,
+    avatar:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuBxCvKWcV0E2zkpZdP11Ln6mL-pLVHZ21IAmXq2SauzjEOVmAMBHCFaaEm46-0_d8uksldlkerWnjJlmN5lD6ljqns9DJ9bxc1KMNTleTuwIBrKa3ZqQ1iGvFdN6zQQhLMfPAJDCplCeKZz9iKKpoNE8MOBB-WHoQG8TV8qCfOwnNXZ4xJd1rLAVBbN9Gu9K6Md7u4jKDo1CWC00d2FO2NaBI-2gnc2ZXZDGP86R0Lk",
+  },
+  {
+    id: 3,
+    name: "Rohan Alwis",
+    bloodGroup: "B-",
+    badge: "Document Review",
+    badgeColor: "text-amber-600 bg-amber-50 dark:bg-amber-950/50",
+    district: "Galle District (Hikkaduwa)",
+    registeredTime: "Registered 2 hrs ago",
+    active: false,
+    avatar:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuD3kBqpdwTKZKpaSbxvTR6bBroZ_3gOs89mcjCA1oTeW4cdvb4hCaDjfYl4aBo1RkBxKq_WSFBFAxI4hGrihFbfP0o7LwA5870AujR33sF-rSreJHvkn67CFOMJbMESlahbj0yuPynK1-jCm7xNw9Vx90gYx9v4CtPBEBcneWqq5JPmyYmKuitnNdKVB1-scJQIUMKpECnnXMp3fpi9rerw3uUlIcI-xwWUhXw7ERv9",
+  },
+];
+

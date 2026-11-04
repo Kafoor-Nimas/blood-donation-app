@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdminOverviewHeader from "../components/admin/AdminOverviewHeader";
@@ -10,8 +10,13 @@ import SecurityTelemetryBox from "../components/admin/SecurityTelemetryBox";
 import { useApp } from "../context/AppContext";
 
 export default function AdminDashboard() {
-  const { isDarkMode } = useApp();
+  const { isDarkMode, fetchAdminData, fetchRequests } = useApp();
   const [activeTab, setActiveTab] = useState("requests");
+
+  useEffect(() => {
+    if (fetchAdminData) fetchAdminData();
+    if (fetchRequests) fetchRequests();
+  }, []);
 
   return (
     <div
@@ -25,19 +30,19 @@ export default function AdminDashboard() {
 
       <main className="w-full flex-1 pt-24 pb-12">
         <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 space-y-8">
-          {/* Top Command & Operational Header */}
+          {/* Top Command Header */}
           <AdminOverviewHeader />
 
-          {/* 4 Operational KPI Cards */}
+          {/* Operational KPI Cards */}
           <AdminKpiCards />
 
           {/* Navigation Tabs */}
           <AdminTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
           {/* Table View */}
-          <AdminRequestTable />
+          <AdminRequestTable activeTab={activeTab} />
 
-          {/* Bottom Dual Column: Donors & Security */}
+          {/* Bottom Dual Column */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <RecentDonorsPanel />
             <SecurityTelemetryBox />

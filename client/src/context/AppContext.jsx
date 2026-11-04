@@ -19,27 +19,42 @@ export const AppProvider = ({ children }) => {
   const [requests, setRequests] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
 
+  // --- Admin State ---
+  const [adminStats, setAdminStats] = useState(null);
+  const [recentDonors, setRecentDonors] = useState([]);
+  const [adminLoading, setAdminLoading] = useState(false);
+
   // 1. Verify existing auth token on initial app load
+  // client/src/context/AppContext.jsx
   useEffect(() => {
     const checkAuthStatus = async () => {
       const token = localStorage.getItem("lifelink_token");
-      if (token) {
-        try {
-          const response = await API.get("/auth/me");
-          setUser(response.data.user || response.data);
-        } catch (error) {
-          console.error("Session verification failed:", error);
+      if (!token) {
+        setUser(null);
+        setAuthLoading(false);
+        return;
+      }
+
+      try {
+        const response = await API.get("/auth/me");
+        const userData = response.data.user || response.data;
+        setUser(userData);
+      } catch (error) {
+        console.error("Session verification failed:", error);
+
+        // ONLY clear token if backend explicitly rejects credentials (401/403)
+        if (error.response?.status === 401 || error.response?.status === 403) {
           localStorage.removeItem("lifelink_token");
           setUser(null);
         }
+      } finally {
+        setAuthLoading(false);
       }
-      setAuthLoading(false);
     };
 
     checkAuthStatus();
   }, []);
-
-  // 2. Fetch Blood Requests with Safe Array Validation & Fallback
+  // 2. Fetch Blood Requests
   const fetchRequests = async () => {
     setLoadingRequests(true);
     try {
@@ -61,6 +76,55 @@ export const AppProvider = ({ children }) => {
     fetchRequests();
   }, []);
 
+  const toggleUserStatus = async (donorId) => {
+    try {
+      const response = await API.patch(`/admin/toggle-status/${donorId}`);
+      if (response.data.success) {
+        const updatedDonor = response.data.donor;
+        setRecentDonors((prev) =>
+          prev.map((d) =>
+            d._id === donorId ? { ...d, isActive: updatedDonor.isActive } : d,
+          ),
+        );
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Failed to toggle donor status:", error);
+      throw error;
+    }
+  };
+
+  const fetchAdminData = async () => {
+    setAdminLoading(true);
+    try {
+      const response = await API.get("/admin");
+      if (response.data.success) {
+        setAdminStats(response.data.stats);
+        setRecentDonors(response.data.donorsList || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch admin statistics:", error);
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
+  const verifyDonor = async (donorId) => {
+    try {
+      const response = await API.patch(`/admin/verify/${donorId}`);
+      if (response.data.success) {
+        setRecentDonors((prev) =>
+          prev.map((d) => (d._id === donorId ? { ...d, isVerified: true } : d)),
+        );
+        fetchAdminData();
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Failed to verify donor:", error);
+      throw error;
+    }
+  };
+
   // 3. Login Handler
   const login = async (credentials) => {
     const response = await API.post("/auth/login", credentials);
@@ -76,7 +140,7 @@ export const AppProvider = ({ children }) => {
     setUser(null);
   };
 
-  // 5. Add Blood Request via Backend API Call
+  // 5. Add Blood Request
   const addBloodRequest = async (newReqData) => {
     try {
       const response = await API.post("/requests", newReqData);
@@ -93,7 +157,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Sync dark mode class with HTML element and update localStorage
+  // Sync dark mode class
   useEffect(() => {
     const root = document.documentElement;
     if (isDarkMode) {
@@ -114,19 +178,23 @@ export const AppProvider = ({ children }) => {
         isDarkMode,
         setIsDarkMode,
         toggleDarkMode,
-        // Auth Exports
         user,
         setUser,
         isAuthenticated: !!user,
         authLoading,
         login,
         logout,
-        // Request Exports
         requests,
         setRequests,
         fetchRequests,
         loadingRequests,
         addBloodRequest,
+        adminStats,
+        recentDonors,
+        adminLoading,
+        fetchAdminData,
+        verifyDonor,
+        toggleUserStatus,
       }}
     >
       {children}
@@ -134,7 +202,6 @@ export const AppProvider = ({ children }) => {
   );
 };
 
-// Custom hook for context consumption
 export const useApp = () => {
   const context = useContext(AppContext);
   if (!context) {

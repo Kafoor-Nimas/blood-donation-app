@@ -22,6 +22,10 @@ export default function FindDonors() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showAvailableOnly, setShowAvailableOnly] = useState(true);
 
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(9);
+
   // Modal States
   const [contactDonor, setContactDonor] = useState(null);
   const [profileDonor, setProfileDonor] = useState(null);
@@ -32,16 +36,18 @@ export default function FindDonors() {
     setErrorMessage("");
     try {
       const response = await API.get("/donors");
-      
+
       // Extract array payload safely whether wrapped or direct
       const data = Array.isArray(response.data)
         ? response.data
         : response.data?.donors || response.data?.data || INITIAL_DONORS_DATA;
-        
+
       setDonors(data);
     } catch (error) {
       console.error("Failed to fetch donor directory:", error);
-      setErrorMessage("Could not load live donor network. Showing cached results.");
+      setErrorMessage(
+        "Could not load live donor network. Showing cached results.",
+      );
       // Fallback to initial mock data on error so UI remains responsive
       setDonors(INITIAL_DONORS_DATA || []);
     } finally {
@@ -52,6 +58,17 @@ export default function FindDonors() {
   useEffect(() => {
     fetchDonors();
   }, []);
+
+  // Reset to Page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    activeGroup,
+    activeDistrict,
+    searchQuery,
+    showAvailableOnly,
+    itemsPerPage,
+  ]);
 
   // 2. Filter Logic (Applies to fetched API donor array)
   const filteredDonors = useMemo(() => {
@@ -67,7 +84,8 @@ export default function FindDonors() {
         return false;
 
       // Availability filter
-      const isAvailable = donor.available !== undefined ? donor.available : donor.isAvailable;
+      const isAvailable =
+        donor.available !== undefined ? donor.available : donor.isAvailable;
       if (showAvailableOnly && !isAvailable) return false;
 
       // City / Location Free Search
@@ -82,11 +100,27 @@ export default function FindDonors() {
     });
   }, [donors, activeGroup, activeDistrict, searchQuery, showAvailableOnly]);
 
+  // 3. Pagination Calculations
+  const totalPages = Math.ceil(filteredDonors.length / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentDonors = useMemo(() => {
+    return filteredDonors.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredDonors, startIndex, itemsPerPage]);
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
   const resetAllFilters = () => {
     setActiveGroup("ALL");
     setActiveDistrict("ALL");
     setSearchQuery("");
     setShowAvailableOnly(true);
+    setCurrentPage(1);
   };
 
   return (
@@ -291,8 +325,8 @@ export default function FindDonors() {
                         activeGroup === grp
                           ? "bg-[#b70011] text-white shadow-sm"
                           : isDarkMode
-                          ? "bg-[#111827] text-[#CBD5E1] hover:bg-[#334155]"
-                          : "bg-blue-50 text-slate-700 hover:bg-slate-200"
+                            ? "bg-[#111827] text-[#CBD5E1] hover:bg-[#334155]"
+                            : "bg-blue-50 text-slate-700 hover:bg-slate-200"
                       }`}
                     >
                       {grp === "ALL" ? "All Groups" : grp}
@@ -490,12 +524,14 @@ export default function FindDonors() {
                 <div
                   key={i}
                   className={`h-64 rounded-2xl animate-pulse border ${
-                    isDarkMode ? "bg-[#1E293B] border-[#334155]" : "bg-slate-200 border-slate-100"
+                    isDarkMode
+                      ? "bg-[#1E293B] border-[#334155]"
+                      : "bg-slate-200 border-slate-100"
                   }`}
                 />
               ))}
             </div>
-          ) : filteredDonors.length === 0 ? (
+          ) : currentDonors.length === 0 ? (
             <div
               className={`rounded-2xl p-12 text-center shadow-sm max-w-xl mx-auto my-8 space-y-4 border ${
                 isDarkMode
@@ -532,7 +568,7 @@ export default function FindDonors() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredDonors.map((donor) => (
+              {currentDonors.map((donor) => (
                 <DonorCard
                   key={donor.id || donor._id}
                   donor={donor}
@@ -543,7 +579,7 @@ export default function FindDonors() {
             </div>
           )}
 
-          {/* Pagination */}
+          {/* Interactive Pagination Footer */}
           <div
             className={`rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 border ${
               isDarkMode
@@ -553,47 +589,65 @@ export default function FindDonors() {
           >
             <div className="flex items-center gap-3 text-xs">
               <span>
-                Showing <strong>1-{filteredDonors.length}</strong> of{" "}
-                <strong>{donors.length}</strong> Registered Donors
+                Showing{" "}
+                <strong>
+                  {filteredDonors.length > 0 ? startIndex + 1 : 0}-
+                  {Math.min(startIndex + itemsPerPage, filteredDonors.length)}
+                </strong>{" "}
+                of <strong>{filteredDonors.length}</strong> Matching Donors (
+                <strong>{donors.length}</strong> Total Registered)
               </span>
               <span className="hidden md:inline">•</span>
               <div className="hidden md:flex items-center gap-1.5">
                 <span>Items per page:</span>
                 <select
-                  className={`rounded-lg px-2 py-1 text-xs focus:outline-none border ${
+                  value={itemsPerPage}
+                  onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                  className={`rounded-lg px-2 py-1 text-xs focus:outline-none border cursor-pointer ${
                     isDarkMode
                       ? "bg-[#111827] border-[#334155] text-[#F8FAFC]"
                       : "bg-blue-50 border-slate-200 text-[#0b1c30]"
                   }`}
                 >
-                  <option value="6">6</option>
-                  <option value="12">12</option>
-                  <option value="24">24</option>
+                  <option value="9">9</option>
+                  <option value="18">18</option>
+                  <option value="27">27</option>
                 </select>
               </div>
             </div>
 
-            <nav className="flex items-center gap-1">
+            <nav className="flex items-center gap-2">
               <button
-                disabled
                 type="button"
-                className="w-9 h-9 rounded-xl flex items-center justify-center opacity-40 cursor-not-allowed"
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed border ${
+                  isDarkMode
+                    ? "bg-[#111827] border-[#334155] hover:bg-[#334155] text-[#F8FAFC]"
+                    : "bg-blue-50 border-slate-200 hover:bg-slate-200 text-slate-700"
+                }`}
+                title="Previous Page"
               >
                 <span className="material-symbols-outlined !text-[18px]">
                   chevron_left
                 </span>
               </button>
+
+              <span className="text-xs font-semibold px-2">
+                Page <strong>{currentPage}</strong> of{" "}
+                <strong>{totalPages}</strong>
+              </span>
+
               <button
                 type="button"
-                className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs bg-[#b70011] text-white shadow-sm"
-              >
-                1
-              </button>
-              <button
-                type="button"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-                  isDarkMode ? "hover:bg-[#334155]" : "hover:bg-blue-50"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed border ${
+                  isDarkMode
+                    ? "bg-[#111827] border-[#334155] hover:bg-[#334155] text-[#F8FAFC]"
+                    : "bg-blue-50 border-slate-200 hover:bg-slate-200 text-slate-700"
                 }`}
+                title="Next Page"
               >
                 <span className="material-symbols-outlined !text-[18px]">
                   chevron_right

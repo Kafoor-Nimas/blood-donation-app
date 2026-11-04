@@ -6,6 +6,8 @@ import RequestCard from "../components/RequestCard";
 import FulfillModal from "../components/FulfillModal";
 import { useApp } from "../context/AppContext";
 
+const ITEMS_PER_PAGE = 9;
+
 export default function BloodRequests() {
   const { isDarkMode, requests, fetchRequests, loadingRequests } = useApp();
 
@@ -15,10 +17,13 @@ export default function BloodRequests() {
   const [districtFilter, setDistrictFilter] = useState("");
   const [urgencyFilter, setUrgencyFilter] = useState("");
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+
   // Modal & Toast States
   const [activeModalRequest, setActiveModalRequest] = useState(null);
   const [toastMessage, setToastMessage] = useState(
-    "Someone responded to Blood Request in Kandy 2 mins ago."
+    "Someone responded to Blood Request in Kandy 2 mins ago.",
   );
   const [showToast, setShowToast] = useState(true);
 
@@ -39,6 +44,11 @@ export default function BloodRequests() {
       fetchRequests();
     }
   }, []);
+
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusTab, bloodFilter, districtFilter, urgencyFilter]);
 
   // Live Activity Ticker Loop
   useEffect(() => {
@@ -79,7 +89,8 @@ export default function BloodRequests() {
 
       // 1. Status Tab Filter
       if (statusTab === "urgent") {
-        if (itemUrgency !== "urgent" && itemUrgency !== "critical") return false;
+        if (itemUrgency !== "urgent" && itemUrgency !== "critical")
+          return false;
       } else if (statusTab === "open" || statusTab === "pending") {
         if (itemStatus !== "pending" && itemStatus !== "open") return false;
       } else if (statusTab === "fulfilled") {
@@ -90,21 +101,51 @@ export default function BloodRequests() {
       if (bloodFilter && item.bloodGroup !== bloodFilter) return false;
 
       // 3. District / Location Filter
-      const itemLocation = `${item.district || ""} ${item.city || ""}`.toLowerCase();
-      if (districtFilter && !itemLocation.includes(districtFilter.toLowerCase())) {
+      const itemLocation =
+        `${item.district || ""} ${item.city || ""}`.toLowerCase();
+      if (
+        districtFilter &&
+        !itemLocation.includes(districtFilter.toLowerCase())
+      ) {
         return false;
       }
 
       // 4. Urgency Filter Dropdown
       if (urgencyFilter) {
-        if (urgencyFilter === "urgent" && itemUrgency !== "urgent" && itemUrgency !== "critical") return false;
-        if (urgencyFilter === "critical" && itemUrgency !== "critical") return false;
-        if (urgencyFilter === "standard" && itemUrgency !== "standard" && itemUrgency !== "low") return false;
+        if (
+          urgencyFilter === "urgent" &&
+          itemUrgency !== "urgent" &&
+          itemUrgency !== "critical"
+        )
+          return false;
+        if (urgencyFilter === "critical" && itemUrgency !== "critical")
+          return false;
+        if (
+          urgencyFilter === "standard" &&
+          itemUrgency !== "standard" &&
+          itemUrgency !== "low"
+        )
+          return false;
       }
 
       return true;
     });
   }, [requests, statusTab, bloodFilter, districtFilter, urgencyFilter]);
+
+  // Pagination Calculations (9 per page)
+  const totalPages = Math.ceil(filteredRequests.length / ITEMS_PER_PAGE) || 1;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentRequests = useMemo(() => {
+    return filteredRequests.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredRequests, startIndex]);
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
 
   // Dynamic Tab Counts Calculation
   const counts = useMemo(() => {
@@ -115,8 +156,12 @@ export default function BloodRequests() {
         const u = (r.urgency || "").toLowerCase();
         return u === "urgent" || u === "critical";
       }).length,
-      open: list.filter((r) => (r.status || "Pending").toLowerCase() === "pending").length,
-      fulfilled: list.filter((r) => (r.status || "").toLowerCase() === "fulfilled").length,
+      open: list.filter(
+        (r) => (r.status || "Pending").toLowerCase() === "pending",
+      ).length,
+      fulfilled: list.filter(
+        (r) => (r.status || "").toLowerCase() === "fulfilled",
+      ).length,
     };
   }, [requests]);
 
@@ -125,13 +170,14 @@ export default function BloodRequests() {
     setBloodFilter("");
     setDistrictFilter("");
     setUrgencyFilter("");
+    setCurrentPage(1);
   };
 
   const handleConfirmFulfill = (request) => {
     setActiveModalRequest(null);
     setShowToast(true);
     setToastMessage(
-      "Thank you! Hospital blood coordinator has been notified of your arrival."
+      "Thank you! Hospital blood coordinator has been notified of your arrival.",
     );
   };
 
@@ -207,9 +253,18 @@ export default function BloodRequests() {
             <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
               {[
                 { id: "all", label: "All Requests", count: counts.all },
-                { id: "urgent", label: "Urgent", count: counts.urgent, dot: true },
+                {
+                  id: "urgent",
+                  label: "Urgent",
+                  count: counts.urgent,
+                  dot: true,
+                },
                 { id: "open", label: "Open", count: counts.open },
-                { id: "fulfilled", label: "Fulfilled", count: counts.fulfilled },
+                {
+                  id: "fulfilled",
+                  label: "Fulfilled",
+                  count: counts.fulfilled,
+                },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -219,8 +274,8 @@ export default function BloodRequests() {
                     statusTab === tab.id
                       ? "bg-[#b70011] text-white shadow-sm"
                       : isDarkMode
-                      ? "text-[#CBD5E1] hover:bg-[#111827]"
-                      : "text-slate-600 hover:bg-slate-100"
+                        ? "text-[#CBD5E1] hover:bg-[#111827]"
+                        : "text-slate-600 hover:bg-slate-100"
                   }`}
                 >
                   {tab.dot && (
@@ -364,16 +419,18 @@ export default function BloodRequests() {
         <div className="max-w-[1600px] mx-auto w-full px-6 lg:px-12 my-6">
           {loadingRequests ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
                 <div
                   key={i}
                   className={`h-56 rounded-2xl animate-pulse border ${
-                    isDarkMode ? "bg-[#1E293B] border-[#334155]" : "bg-slate-200 border-slate-100"
+                    isDarkMode
+                      ? "bg-[#1E293B] border-[#334155]"
+                      : "bg-slate-200 border-slate-100"
                   }`}
                 />
               ))}
             </div>
-          ) : filteredRequests.length === 0 ? (
+          ) : currentRequests.length === 0 ? (
             <div
               className={`rounded-2xl p-12 text-center shadow-sm max-w-xl mx-auto border ${
                 isDarkMode
@@ -405,7 +462,7 @@ export default function BloodRequests() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredRequests.map((req) => (
+              {currentRequests.map((req) => (
                 <RequestCard
                   key={req._id || req.id}
                   request={req}
@@ -416,7 +473,7 @@ export default function BloodRequests() {
           )}
         </div>
 
-        {/* Pagination Bar */}
+        {/* Interactive Pagination Bar */}
         <div className="max-w-[1600px] mx-auto w-full px-6 lg:px-12 my-8">
           <div
             className={`p-4 rounded-2xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 border ${
@@ -426,32 +483,47 @@ export default function BloodRequests() {
             }`}
           >
             <div className="text-xs">
-              Showing <strong>1 - {filteredRequests.length}</strong> of{" "}
-              <strong>{requests.length}</strong> verified requests
+              Showing{" "}
+              <strong>
+                {filteredRequests.length > 0 ? startIndex + 1 : 0} -{" "}
+                {Math.min(startIndex + ITEMS_PER_PAGE, filteredRequests.length)}
+              </strong>{" "}
+              of <strong>{filteredRequests.length}</strong> matching requests (
+              <strong>{requests.length}</strong> Total Requisitions)
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-                  isDarkMode ? "hover:bg-[#334155]" : "hover:bg-slate-100"
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors border cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                  isDarkMode
+                    ? "bg-[#111827] border-[#334155] hover:bg-[#334155] text-[#F8FAFC]"
+                    : "bg-blue-50 border-slate-200 hover:bg-slate-200 text-slate-700"
                 }`}
+                title="Previous Page"
               >
                 <span className="material-symbols-outlined !text-[20px]">
                   chevron_left
                 </span>
               </button>
+
+              <span className="text-xs font-semibold px-2">
+                Page <strong>{currentPage}</strong> of{" "}
+                <strong>{totalPages}</strong>
+              </span>
+
               <button
                 type="button"
-                className="w-9 h-9 rounded-xl bg-[#b70011] text-white font-bold text-xs shadow"
-              >
-                1
-              </button>
-              <button
-                type="button"
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-                  isDarkMode ? "hover:bg-[#334155]" : "hover:bg-slate-100"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors border cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                  isDarkMode
+                    ? "bg-[#111827] border-[#334155] hover:bg-[#334155] text-[#F8FAFC]"
+                    : "bg-blue-50 border-slate-200 hover:bg-slate-200 text-slate-700"
                 }`}
+                title="Next Page"
               >
                 <span className="material-symbols-outlined !text-[20px]">
                   chevron_right

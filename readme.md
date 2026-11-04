@@ -33,8 +33,6 @@ The platform provides a centralized system for managing blood donors, coordinati
 - Overview of donors, users, and blood requests.
 - Manage donor and user accounts.
 - Monitor and update blood request statuses.
-- Review audit and security logs.
-- Search, filter, and paginate records.
 
 ### 📱 Responsive User Interface
 - Responsive layouts for desktop, tablet, and mobile devices.
@@ -153,20 +151,11 @@ cd server
 npm install
 ```
 
-### 4. Seed the Database (Optional)
 
-If your project includes a database seeding script, run:
-
-```bash
-npm run seed
-```
-
-This initializes the database with sample data, if supported by your seed script.
-
-### 5. Start the Backend Server
+### 4. Start the Backend Server
 
 ```bash
-npm run dev
+npm run server
 ```
 
 The backend API should be available at:
@@ -175,7 +164,7 @@ The backend API should be available at:
 http://localhost:5000
 ```
 
-### 6. Install Frontend Dependencies
+### 5. Install Frontend Dependencies
 
 Open a new terminal and navigate to the client directory:
 
@@ -185,7 +174,7 @@ cd client
 npm install
 ```
 
-### 7. Start the Frontend
+### 6. Start the Frontend
 
 ```bash
 npm run dev
@@ -227,7 +216,6 @@ LifeLink is designed with user privacy and application security in mind.
 - Administrative actions should be restricted to authorized users.
 - Sensitive donor contact information should be handled carefully.
 - Environment variables should be used for confidential configuration.
-- Audit logs should avoid storing passwords, authentication tokens, or other sensitive credentials.
 
 ---
 

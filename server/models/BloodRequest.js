@@ -32,7 +32,7 @@ const bloodRequestSchema = new mongoose.Schema(
     contactPhone: { type: String, default: "N/A" },
     status: {
       type: String,
-      enum: ["Pending", "Fulfilled", "Cancelled"],
+      enum: ["Pending", "Open", "Under Coordination", "Fulfilled", "Cancelled"],
       default: "Pending",
     },
   },

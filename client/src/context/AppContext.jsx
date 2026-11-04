@@ -54,6 +54,30 @@ export const AppProvider = ({ children }) => {
 
     checkAuthStatus();
   }, []);
+
+  const updateRequestStatus = async (requestId, newStatus) => {
+    try {
+      const response = await API.patch(`/requests/${requestId}/status`, {
+        status: newStatus,
+      });
+
+      if (response.data) {
+        // Optimistically update requests in local state
+        setRequests((prevRequests) =>
+          prevRequests.map((req) =>
+            req._id === requestId || req.id === requestId
+              ? { ...req, status: newStatus }
+              : req,
+          ),
+        );
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update request status:", error);
+      throw error;
+    }
+  };
+
   // 2. Fetch Blood Requests
   const fetchRequests = async () => {
     setLoadingRequests(true);
@@ -199,6 +223,7 @@ export const AppProvider = ({ children }) => {
         fetchAdminData,
         verifyDonor,
         toggleUserStatus,
+        updateRequestStatus,
       }}
     >
       {children}

@@ -75,3 +75,45 @@ export const getBloodRequests = async (req, res) => {
     });
   }
 };
+
+export const updateRequestStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let { status } = req.body;
+
+    const requestItem = await BloodRequest.findById(id);
+
+    if (!requestItem) {
+      return res.status(404).json({
+        success: false,
+        message: "Blood request not found",
+      });
+    }
+
+    if (status) {
+      // Map legacy or lowercase status values to allowed schema enum values
+      if (status.toLowerCase() === "open") status = "Open";
+      if (status.toLowerCase() === "pending") status = "Pending";
+      if (status.toLowerCase() === "under coordination")
+        status = "Under Coordination";
+      if (status.toLowerCase() === "fulfilled") status = "Fulfilled";
+      if (status.toLowerCase() === "cancelled") status = "Cancelled";
+
+      requestItem.status = status;
+    }
+
+    await requestItem.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Request status updated successfully",
+      request: requestItem,
+    });
+  } catch (error) {
+    console.error("Error updating request status:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

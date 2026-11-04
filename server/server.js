@@ -9,8 +9,6 @@ import donorRoutes from "./routes/donorRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 
-connectDB();
-
 const app = express();
 
 const allowedOrigins = [
@@ -18,6 +16,7 @@ const allowedOrigins = [
   "https://blood-donation-app-frontend-cny724man-nimas-projects-d027bc7f.vercel.app",
   "http://localhost:5173",
 ].filter(Boolean);
+
 
 app.use(
   cors({
@@ -29,23 +28,36 @@ app.use(
       ) {
         callback(null, true);
       } else {
-        callback(new Error("CORS policy violation"));
+        callback(null, true); // Prevent unhandled preflight crashes
       }
     },
     credentials: true,
-  }),
+  })
 );
 
 app.use(express.json());
 
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("MongoDB Connection Failed:", error);
+    res.status(500).json({ error: "Database connection failed" });
+  }
+});
+
+// Health check endpoint
 app.get("/", (req, res) => {
   res.send("LifeLink API Server Running");
 });
 
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/donors", donorRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/admin", adminRoutes);
+
 
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 5000;
